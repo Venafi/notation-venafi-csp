@@ -1,0 +1,35 @@
+name: Build-Release
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+          check-latest: true
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: build notation-venafi-csp
+        run: |
+          make cross
+          mv notation-venafi-csp-windows-amd64 notation-venafi-csp-windows-amd64.exe
+      - name: Upload artifacts
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: |
+            notation-*
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "notation-*"
+          bodyFile: "CHANGELOG.md"
+           
