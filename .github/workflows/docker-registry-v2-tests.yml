@@ -58,5 +58,5 @@ jobs:
           export NOTATION_EXPERIMENTAL=1
           ./notation key add ${{ secrets.CERTIFICATE_LABEL }} --plugin venafi-csp --id ${{ secrets.CERTIFICATE_LABEL }} --plugin-config "config"="${{ github.workspace }}/config.ini"
           # notation certificate add --type ca --store ${{ secrets.DOMAIN }} ${{ github.workspace }}/vhroot.crt
-          ./notation sign -k ${{ secrets.CERTIFICATE_LABEL }} --signature-manifest=image localhost:5000/$IMAGE
+          ./notation sign -k ${{ secrets.CERTIFICATE_LABEL }} --signature-manifest=image ${{ env.REGISTRY }}/net-monitor:v1
   
