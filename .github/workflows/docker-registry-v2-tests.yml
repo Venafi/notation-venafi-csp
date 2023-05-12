@@ -48,7 +48,7 @@ jobs:
         run: |
           make build
           mkdir -p  ~/.config/notation/plugins/venafi-csp
-          cp notation-venafi-csp ~/.config/notation/plugins/venafi-csp/
+          cp bin/notation-venafi-csp ~/.config/notation/plugins/venafi-csp/
           echo "Downloading notation version"
           curl -sL https://github.com/notaryproject/notation/releases/download/v${{ env.NOTATION_VERSION }}/notation_${{ env.NOTATION_VERSION }}_linux_amd64.tar.gz -o notation.tar.gz
           tar xvf notation.tar.gz
