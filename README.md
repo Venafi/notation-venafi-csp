@@ -1,4 +1,7 @@
-# notation-venafi-csp
+[![Venafi](https://raw.githubusercontent.com/Venafi/.github/master/images/Venafi_logo.png)](https://www.venafi.com/)
+[![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Community Supported](https://img.shields.io/badge/Support%20Level-Community-brightgreen)
+![Compatible with TPP 21.x](https://img.shields.io/badge/Compatibility-TPP%2021.x-f9a90c)
 
 Venafi CodeSign Protect Signature Plugin for the Notary v2 [Notation CLI](https://github.com/notaryproject/notation).
 
