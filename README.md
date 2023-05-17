@@ -7,6 +7,12 @@ Venafi CodeSign Protect Signature Plugin for the Notary v2 [Notation CLI](https:
 
 This is a WIP plugin that aims to be compliant with the plugin [spec](https://github.com/notaryproject/notaryproject/blob/main/specs/plugin-extensibility.md).
 
+#### Signature Format Compatibility
+| Type | Supported |
+| ---- | --------- |
+| [JWS](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-jws.md) | :heavy_check_mark: |
+| [COSE Sign1](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-cose.md) | :x: |
+
 ## Getting Started:
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
