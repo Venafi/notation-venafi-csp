@@ -3,7 +3,7 @@ module github.com/venafi/notation-venafi-csp
 go 1.19
 
 require (
-	github.com/notaryproject/notation-go v1.0.0-rc.4
+	github.com/notaryproject/notation-go v1.0.0-rc.6
 	github.com/venafi/vsign v1.0.0-beta.0.20230511165159-aab3b215c6f9
 )
 
@@ -29,6 +29,6 @@ require (
 )
 
 require (
-	github.com/notaryproject/notation-core-go v1.0.0-rc.3 // indirect
+	github.com/notaryproject/notation-core-go v1.0.0-rc.4 // indirect
 	github.com/urfave/cli/v2 v2.25.3
 )
