@@ -29,12 +29,12 @@ var metadata []byte
 func init() {
 	var err error
 	metadata, err = json.Marshal(proto.GetMetadataResponse{
-		Name:                      "venafi-csp",
+		Name:                      version.PluginName,
 		Description:               "Sign artifacts with keys in Venafi CodeSign Protect",
 		Version:                   version.GetVersion(),
-		URL:                       "https://coolsolutions.venafi.com/ivan.wallis/notation-venafi-csp",
+		URL:                       "https://github.com/Venafi/notation-venafi-csp",
 		SupportedContractVersions: []string{proto.ContractVersion},
-		Capabilities:              []proto.Capability{proto.CapabilitySignatureGenerator},
+		Capabilities:              []proto.Capability{proto.CapabilityEnvelopeGenerator, proto.CapabilityTrustedIdentityVerifier, proto.CapabilityRevocationCheckVerifier},
 	})
 	if err != nil {
 		panic(err)

@@ -3,13 +3,16 @@ module github.com/venafi/notation-venafi-csp
 go 1.19
 
 require (
-	github.com/notaryproject/notation-go v1.0.0-rc.4
+	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/notaryproject/notation-go v1.0.0-rc.6
 	github.com/venafi/vsign v1.0.0-beta.0.20230511165159-aab3b215c6f9
 )
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/digitorus/pkcs7 v0.0.0-20230220124406-51331ccfc40f // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/google/certificate-transparency-go v1.1.5 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -29,6 +32,9 @@ require (
 )
 
 require (
-	github.com/notaryproject/notation-core-go v1.0.0-rc.3 // indirect
+	github.com/cloudflare/cfssl v1.6.4
+	github.com/digitorus/timestamp v0.0.0-20230220124323-d542479a2425
+	github.com/notaryproject/notation-core-go v1.0.0-rc.4
 	github.com/urfave/cli/v2 v2.25.3
+	golang.org/x/crypto v0.9.0
 )

@@ -8,15 +8,14 @@ import (
 	"os"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
-	"github.com/venafi/notation-venafi-csp/internal/signature"
-
 	"github.com/urfave/cli/v2"
+	"github.com/venafi/notation-venafi-csp/internal/signature"
 )
 
-var signCommand = &cli.Command{
-	Name:   string(proto.CommandGenerateEnvelope),
-	Usage:  "Sign artifacts with keys in Venafi CodeSign Protect",
-	Action: runSign,
+var verifyCommand = &cli.Command{
+	Name:   string(proto.CommandVerifySignature),
+	Usage:  "Verifies artifact signatures produced by Venafi CodeSign Protect",
+	Action: runVerify,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:      "file",
@@ -27,7 +26,7 @@ var signCommand = &cli.Command{
 	},
 }
 
-func runSign(ctx *cli.Context) error {
+func runVerify(ctx *cli.Context) error {
 
 	var r io.Reader
 	if f := ctx.String("file"); f != "" {
@@ -42,7 +41,7 @@ func runSign(ctx *cli.Context) error {
 	} else {
 		r = os.Stdin
 	}
-	var req proto.GenerateEnvelopeRequest
+	var req proto.VerifySignatureRequest
 	err := json.NewDecoder(r).Decode(&req)
 	if err != nil {
 		return proto.RequestError{
@@ -50,7 +49,7 @@ func runSign(ctx *cli.Context) error {
 			Err:  fmt.Errorf("failed to unmarshal request input: %w", err),
 		}
 	}
-	resp, err := signature.SignEnvelope(ctx.Context, &req)
+	resp, err := signature.Verify(ctx.Context, &req)
 	if err != nil {
 		var rerr proto.RequestError
 		if errors.As(err, &rerr) {

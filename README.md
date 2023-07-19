@@ -16,7 +16,7 @@ This is a WIP plugin that aims to be compliant with the plugin [spec](https://gi
 ## Getting Started:
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
-- This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
+- This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
 - Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.0.0-rc.4).  Version v1.0.0-rc.4 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
 - Install the notation-venafi-csp pluging for remote signing and verification:
  ```bash
@@ -84,6 +84,8 @@ For a Window user, store file trustpolicy.json under directory `C:\Users\<userna
 # Remotely sign with Venafi CodeSign Protect
 - Obtain certificate
 
+You should use the certificate label that matches the Venafi CodeSign Protect environment obtained using `pkcs11config`:
+
 ```bash
 pkcs11config getcertificate <...>
 ```
@@ -94,6 +96,8 @@ pkcs11config getcertificate <...>
 notation key add --default "vsign-rsa2048-cert" --plugin venafi-csp --id "vsign-rsa2048-cert" --plugin-config "config"="/path/to/vsign/config.ini"
 notation certificate add --type ca --store example.com /path/to/chain.crt
 ```
+
+*Note: A best practice for Key Id naming would be to use the certificate label that matches the Venafi CodeSign Protect environment*
 
 - List the keys and certs to confirm
 

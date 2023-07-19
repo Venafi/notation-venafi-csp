@@ -46,7 +46,7 @@ build: $(addprefix bin/,$(PLUGIN)) ## builds binaries
 
 .PHONY: clean
 clean:
-	git status --ignored --short | grep '^!! ' | sed 's/!! //' | xargs rm -rf
+	git status --short | grep '^!! ' | sed 's/!! //' | xargs rm -rf
 
 .PHONY: test
 test:
