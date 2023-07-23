@@ -1,9 +1,9 @@
 [![Venafi](https://raw.githubusercontent.com/Venafi/.github/master/images/Venafi_logo.png)](https://www.venafi.com/)
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Community Supported](https://img.shields.io/badge/Support%20Level-Community-brightgreen)
-![Compatible with TPP 21.x](https://img.shields.io/badge/Compatibility-TPP%2021.x-f9a90c)
+![Compatible with TPP 22.x](https://img.shields.io/badge/Compatibility-TPP%2022.x-f9a90c)
 
-Venafi CodeSign Protect Signature Plugin for the Notary v2 [Notation CLI](https://github.com/notaryproject/notation).
+Venafi CodeSign Protect Signature and Verification Plugin for the Notary v2 [Notation CLI](https://github.com/notaryproject/notation).
 
 This is a WIP plugin that aims to be compliant with the plugin [spec](https://github.com/notaryproject/notaryproject/blob/main/specs/plugin-extensibility.md).
 
@@ -13,10 +13,22 @@ This is a WIP plugin that aims to be compliant with the plugin [spec](https://gi
 | [JWS](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-jws.md) | :heavy_check_mark: |
 | [COSE Sign1](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-cose.md) | :x: |
 
+#### Plugin Spec Compatibility
+| Capability | Compatibility |
+| ---------- | ------------- |
+| keySpec | `RSA-2048`, `RSA-3072`, `RSA-4096`, `EC-256`, `EC-384`, `EC-521` |
+| hashAlgorithm | `SHA-256` |
+| signingAlgorithm | `RSASSA-PSS-SHA-256`, `ECDSA-SHA-256` |
+| pluginCapability | `SIGNATURE_GENERATOR.ENVELOPE`, `SIGNATURE_VERIFIER.TRUSTED_IDENTITY`, `SIGNATURE_VERIFIER.REVOCATION_CHECK` |
+| signatureEnvelopeType | `application/jose+json` ([JWS](https://datatracker.ietf.org/doc/html/rfc7515)) |
+| extendedAttributes | `com.venafi.notation.plugin.x5u` (only generated with TPP 23.1+ for experimental identity validation support)|
+| signingScheme | `notary.x509` |
+
+
 ## Getting Started:
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
-- This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
+- This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
 - Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.0.0-rc.4).  Version v1.0.0-rc.4 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
 - Install the notation-venafi-csp pluging for remote signing and verification:
  ```bash
@@ -84,6 +96,8 @@ For a Window user, store file trustpolicy.json under directory `C:\Users\<userna
 # Remotely sign with Venafi CodeSign Protect
 - Obtain certificate
 
+You should use the certificate label that matches the Venafi CodeSign Protect environment obtained using `pkcs11config`:
+
 ```bash
 pkcs11config getcertificate <...>
 ```
@@ -94,6 +108,8 @@ pkcs11config getcertificate <...>
 notation key add --default "vsign-rsa2048-cert" --plugin venafi-csp --id "vsign-rsa2048-cert" --plugin-config "config"="/path/to/vsign/config.ini"
 notation certificate add --type ca --store example.com /path/to/chain.crt
 ```
+
+*Note: A best practice for Key Id naming would be to use the certificate label that matches the Venafi CodeSign Protect environment*
 
 - List the keys and certs to confirm
 
@@ -126,3 +142,5 @@ notation verify $IMAGE
 ```bash
 Signature verification succeeded for sha256:73b3c3f2200bc6c161663b88b1fde3b3ed486518d6b6453fccdfdbbaefa09c7b
 ```
+
+*Note: Verification does perform additional checks such as verifying the revocation status of the code signing certificate, as well as validating that the certificate does exist in CodeSign Protec via PKS for identity validation purposes if using TPP 23.1+ (experimental).*

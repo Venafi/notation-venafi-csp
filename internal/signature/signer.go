@@ -3,20 +3,35 @@ package signature
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	// Make required hashers available.
 
+	"crypto/ecdsa"
+	"crypto/rsa"
 	_ "crypto/sha256"
 	_ "crypto/sha512"
 	"crypto/tls"
+	"crypto/x509"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/notaryproject/notation-go/plugin/proto"
 	"github.com/venafi/notation-venafi-csp/internal/logger"
+	"github.com/venafi/notation-venafi-csp/internal/signature/jws"
 	c "github.com/venafi/vsign/pkg/crypto"
 	"github.com/venafi/vsign/pkg/endpoint"
+	"github.com/venafi/vsign/pkg/verror"
 	"github.com/venafi/vsign/pkg/vsign"
+)
+
+const (
+	MediaTypePayloadV1        = "application/vnd.cncf.notary.payload.v1+json"
+	signatureEnvelopeTypeJOSE = "application/jose+json"
+	signatureEnvelopeTypeCOSE = "application/cose"
+	defaultDigestAlg          = "sha256"
 )
 
 var (
@@ -28,6 +43,192 @@ func setTLSConfig() error {
 	tlsConfig.Renegotiation = tls.RenegotiateFreelyAsClient
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tlsConfig
 	return nil
+}
+
+func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*proto.GenerateEnvelopeResponse, error) {
+	if req == nil || req.KeyID == "" || req.PayloadType == "" || req.SignatureEnvelopeType == "" || len(req.PluginConfig) == 0 {
+		for key, value := range req.PluginConfig {
+			return nil, logger.Log("notation.log", key+"="+value)
+		}
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("invalid request input"),
+		}
+	}
+
+	// TODO implement signature envelope type
+	if req.SignatureEnvelopeType == "cose" {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("unsupported signature envelope type"),
+		}
+	}
+
+	err := setTLSConfig()
+	if err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("error setting TLS config"),
+		}
+	}
+
+	//Requires PluginConfig with following key:value format:
+	//config=<path.to.config.ini>
+	if path, ok := req.PluginConfig["config"]; ok {
+		cfg, err := vsign.BuildConfig(ctx, path)
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("error building TPP config"),
+			}
+		}
+
+		connector, err := vsign.NewClient(&cfg)
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("unable to connect to TPP Server: " + cfg.BaseUrl),
+			}
+
+		}
+
+		env, err := connector.GetEnvironment()
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("CSP Get Environment Error: " + err.Error()),
+			}
+		}
+
+		certs, err := c.ParseCertificates(env.CertificateChainData)
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("certificate parsing error: " + err.Error()),
+			}
+		}
+
+		mech, jwtAlg := certAlgToMech(certs[0])
+		if mech == 0 {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("unrecognized signing algorithm"),
+			}
+		}
+
+		// Obtain X5U lookup URL for identity validation during signature verification
+		x5u, err := connector.GetJwksX5u(certs[0])
+		if err != nil && err != verror.UnSupportedAPI {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("error obtaining jwks x5u"),
+			}
+		}
+
+		// Generate extended attributes
+		ext := jws.GenerateExtendedAttributes(x5u)
+
+		// get all attributes ready to be signed
+		signedAttrs, err := jws.GetSignedAttributes(ext, jwtAlg)
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("payload unmarshal error: " + err.Error()),
+			}
+		}
+
+		// parse payload as jwt.MapClaims
+		// [jwt-go]: https://pkg.go.dev/github.com/dgrijalva/jwt-go#MapClaims
+		var payload jwt.MapClaims
+		if err = json.Unmarshal(req.Payload, &payload); err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("payload format error: %v" + err.Error()),
+			}
+		}
+
+		// generate token
+		token := jwt.NewWithClaims(jwt.GetSigningMethod(jwtAlg), payload)
+		token.Header = signedAttrs
+
+		var sstr string
+
+		if sstr, err = token.SigningString(); err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("jwt signing string error: %v" + err.Error()),
+			}
+		}
+
+		sig, err := connector.Sign(&endpoint.SignOption{
+			KeyID:     env.KeyID,
+			Mechanism: mech,
+			DigestAlg: defaultDigestAlg,
+			Payload:   []byte(sstr),
+			B64Flag:   false,
+			RawFlag:   false,
+		})
+
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("signing error: " + err.Error()),
+			}
+		}
+
+		compact := strings.Join([]string{sstr, base64.RawURLEncoding.EncodeToString(sig)}, ".")
+
+		// TODO need RFC3161 support within notation cli
+		/*tsrRsp, err := jws.GenerateRFC3161TimeStampSignature(sig)
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("timestamping error: " + err.Error()),
+			}
+		}*/
+
+		// generate envelope
+		// envelope, err := jws.GenerateJWS(compact, certs, tsrRsp)
+		envelope, err := jws.GenerateJWS(compact, certs)
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("invalid signature error: %v" + err.Error()),
+			}
+		}
+
+		encoded, err := json.Marshal(envelope)
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("invalid json encoding error: %v" + err.Error()),
+			}
+		}
+
+		//dec, err := base64.StdEncoding.DecodeString(string(encoded))
+
+		if err != nil {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("base64 decoding error: " + err.Error() + "[" + string(encoded) + "]"),
+			}
+		}
+
+		//newSig, _ := base64.RawURLEncoding.DecodeString(base64.RawURLEncoding.EncodeToString(dec))
+
+		var sigEnvelopeResponse = &proto.GenerateEnvelopeResponse{
+			//SignatureEnvelope:     newSig,
+			SignatureEnvelope:     encoded,
+			SignatureEnvelopeType: signatureEnvelopeTypeJOSE,
+		}
+
+		return sigEnvelopeResponse, nil
+	}
+
+	return nil, proto.RequestError{
+		Code: proto.ErrorCodeValidation,
+		Err:  errors.New("error during signing operation: " + err.Error()),
+	}
 }
 
 func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.GenerateSignatureResponse, error) {
@@ -97,7 +298,7 @@ func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.Gene
 		sig, err := connector.Sign(&endpoint.SignOption{
 			KeyID:     env.KeyID,
 			Mechanism: mech,
-			DigestAlg: "sha256",
+			DigestAlg: defaultDigestAlg,
 			Payload:   req.Payload,
 			B64Flag:   false,
 			RawFlag:   true,
@@ -121,29 +322,6 @@ func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.Gene
 
 		newSig, _ := base64.RawURLEncoding.DecodeString(base64.RawURLEncoding.EncodeToString(dec))
 
-		// Load ZTPKI Root
-		/*r, _ := ioutil.ReadFile("/Users/ivan.wallis/notation-venafi-csp/test/ztpkiroot.crt")
-		block, _ := pem.Decode(r)
-
-		root, err := x509.ParseCertificate(block.Bytes)
-		if err != nil {
-			return nil, plugin.RequestError{
-				Code: plugin.ErrorCodeValidation,
-				Err:  errors.New("invalid certificate"),
-			}
-		}
-
-		r, _ = ioutil.ReadFile("/Users/ivan.wallis/notation-venafi-csp/test/ztpkiissuer.crt")
-		block, _ = pem.Decode(r)
-
-		ica, err := x509.ParseCertificate(block.Bytes)
-		if err != nil {
-			return nil, plugin.RequestError{
-				Code: plugin.ErrorCodeValidation,
-				Err:  errors.New("invalid certificate"),
-			}
-		}*/
-
 		sigAlg, err := proto.EncodeSigningAlgorithm(keySpec.SignatureAlgorithm())
 		if err != nil {
 			return nil, proto.RequestError{
@@ -156,8 +334,6 @@ func Sign(ctx context.Context, req *proto.GenerateSignatureRequest) (*proto.Gene
 			KeyID:            req.KeyID,
 			Signature:        newSig,
 			SigningAlgorithm: string(sigAlg),
-			//CertificateChain: [][]byte{env.Certificate.Raw},
-			//CertificateChain: [][]byte{env.Certificate.Raw, ica.Raw, root.Raw},
 			CertificateChain: env.CertificateChainData,
 		}
 
@@ -179,4 +355,15 @@ func keySpecToAlg(k proto.KeySpec) int {
 		return c.EcDsa
 	}
 	return 0
+}
+
+func certAlgToMech(cert *x509.Certificate) (int, string) {
+	switch cert.PublicKey.(type) {
+	case *ecdsa.PublicKey:
+		return c.EcDsa, "ES256"
+	case *rsa.PublicKey:
+		return c.RsaPkcsPss, "PS256"
+	default:
+		return 0, ""
+	}
 }

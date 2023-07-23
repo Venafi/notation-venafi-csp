@@ -9,7 +9,11 @@ docker build -t localhost:$PORT/$IMAGE https://github.com/wabbit-networks/net-mo
 docker push localhost:$PORT/$IMAGE
 
 # sign
-notation sign -k $SIGNER --signature-manifest=image localhost:$PORT/$IMAGE
+#notation sign -k $SIGNER --signature-manifest=image localhost:$PORT/$IMAGE
+notation sign -d -v -k $SIGNER --signature-format=jws localhost:$PORT/$IMAGE
+
+# verify
+notation verify -d -v localhost:$PORT/$IMAGE
 
 #sigscan repo localhost:$PORT --insecure --output pretty
 

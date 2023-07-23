@@ -1,8 +1,13 @@
 package version
 
+const (
+	PluginName   = "venafi-csp"
+	SigningAgent = "notation-venafi-csp"
+)
+
 var (
 	// Version shows the current notation-venafi-csp version, optionally with pre-release.
-	Version = "v0.1.0-beta"
+	Version = "0.2.0"
 
 	// BuildMetadata stores the build metadata.
 	BuildMetadata = "release"
@@ -13,5 +18,5 @@ func GetVersion() string {
 	if BuildMetadata == "" {
 		return Version
 	}
-	return Version + "+" + BuildMetadata
+	return Version + "-" + BuildMetadata
 }
