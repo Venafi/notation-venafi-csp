@@ -7,6 +7,8 @@ import (
 
 	"github.com/notaryproject/notation-go/plugin/proto"
 	"github.com/venafi/notation-venafi-csp/internal/revoke"
+	"github.com/venafi/notation-venafi-csp/internal/signature/jws"
+	"github.com/venafi/vsign/pkg/venafi/tpp"
 )
 
 func Verify(ctx context.Context, req *proto.VerifySignatureRequest) (*proto.VerifySignatureResponse, error) {
@@ -17,7 +19,6 @@ func Verify(ctx context.Context, req *proto.VerifySignatureRequest) (*proto.Veri
 			Err:  errors.New("invalid request input"),
 		}
 	}
-
 	err := setTLSConfig()
 	if err != nil {
 		return nil, proto.RequestError{
@@ -27,9 +28,30 @@ func Verify(ctx context.Context, req *proto.VerifySignatureRequest) (*proto.Veri
 	}
 
 	results := make(map[proto.Capability]*proto.VerificationResult)
-	results[proto.CapabilityTrustedIdentityVerifier] = &proto.VerificationResult{
-		Success: true,
-		Reason:  "None",
+	var attr []string
+
+	if url, found := req.Signature.CriticalAttributes.ExtendedAttributes[jws.HeaderVerificationPluginX5U]; found {
+		// TPP 23.1+ capability
+		_, err := tpp.GetPKSCertificate(url.(string))
+		// If x5u exists however TPP no longer manages the lifecycle then fail identity validation
+		if err != nil {
+			results[proto.CapabilityTrustedIdentityVerifier] = &proto.VerificationResult{
+				Success: false,
+				//Reason:  "identity validation failed due to missing certificate in CodeSign Protect",
+				Reason: err.Error(),
+			}
+		} else {
+			results[proto.CapabilityTrustedIdentityVerifier] = &proto.VerificationResult{
+				Success: true,
+				Reason:  "Identity validated with x5u extended attribute",
+			}
+		}
+		attr = append(attr, jws.HeaderVerificationPluginX5U)
+	} else {
+		results[proto.CapabilityTrustedIdentityVerifier] = &proto.VerificationResult{
+			Success: true,
+			Reason:  "None",
+		}
 	}
 
 	// Check Revocation status of code signing certificate
@@ -58,9 +80,14 @@ func Verify(ctx context.Context, req *proto.VerifySignatureRequest) (*proto.Veri
 		}
 	}
 
+	processed := make([]interface{}, len(attr))
+	for i, s := range attr {
+		processed[i] = s
+	}
+
 	var verifyResponse = &proto.VerifySignatureResponse{
 		VerificationResults: results,
-		ProcessedAttributes: nil,
+		ProcessedAttributes: processed,
 	}
 
 	return verifyResponse, nil

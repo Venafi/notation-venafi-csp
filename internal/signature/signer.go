@@ -23,6 +23,7 @@ import (
 	"github.com/venafi/notation-venafi-csp/internal/signature/jws"
 	c "github.com/venafi/vsign/pkg/crypto"
 	"github.com/venafi/vsign/pkg/endpoint"
+	"github.com/venafi/vsign/pkg/verror"
 	"github.com/venafi/vsign/pkg/vsign"
 )
 
@@ -115,8 +116,17 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 			}
 		}
 
+		// Obtain X5U lookup URL for identity validation during signature verification
+		x5u, err := connector.GetJwksX5u(certs[0])
+		if err != nil && err != verror.UnSupportedAPI {
+			return nil, proto.RequestError{
+				Code: proto.ErrorCodeValidation,
+				Err:  errors.New("error obtaining jwks x5u"),
+			}
+		}
+
 		// Generate extended attributes
-		ext := jws.GenerateExtendedAttributes()
+		ext := jws.GenerateExtendedAttributes(x5u)
 
 		// get all attributes ready to be signed
 		signedAttrs, err := jws.GetSignedAttributes(ext, jwtAlg)
@@ -168,16 +178,18 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 
 		compact := strings.Join([]string{sstr, base64.RawURLEncoding.EncodeToString(sig)}, ".")
 
-		tsrRsp, err := jws.GenerateRFC3161TimeStampSignature(sig)
+		// TODO need RFC3161 support within notation cli
+		/*tsrRsp, err := jws.GenerateRFC3161TimeStampSignature(sig)
 		if err != nil {
 			return nil, proto.RequestError{
 				Code: proto.ErrorCodeValidation,
 				Err:  errors.New("timestamping error: " + err.Error()),
 			}
-		}
+		}*/
 
 		// generate envelope
-		envelope, err := jws.GenerateJWS(compact, certs, tsrRsp)
+		// envelope, err := jws.GenerateJWS(compact, certs, tsrRsp)
+		envelope, err := jws.GenerateJWS(compact, certs)
 		if err != nil {
 			return nil, proto.RequestError{
 				Code: proto.ErrorCodeValidation,

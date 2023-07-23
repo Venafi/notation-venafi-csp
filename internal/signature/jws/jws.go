@@ -24,7 +24,7 @@ const (
 	headerTimeStampSignature           = "io.cncf.notary.timestampSignature"
 	headerVerificationPlugin           = "io.cncf.notary.verificationPlugin"
 	headerVerificationPluginMinVersion = "io.cncf.notary.verificationPluginMinVersion"
-	headerVerificationPluginX5U        = "com.venafi.notation.plugin.x5u"
+	HeaderVerificationPluginX5U        = "com.venafi.notation.plugin.x5u"
 )
 
 // jwsUnprotectedHeader contains the set of unprotected headers.
@@ -84,15 +84,18 @@ type jwsEnvelope struct {
 	Signature string `json:"signature"`
 }
 
-func GenerateExtendedAttributes() []signature.Attribute {
+func GenerateExtendedAttributes(x5u string) []signature.Attribute {
 	// Need extended protected headers for plugin signature envelope verification
 	var ext []signature.Attribute
 	ext = append(ext, signature.Attribute{Key: headerVerificationPlugin, Value: version.PluginName, Critical: true})
 	ext = append(ext, signature.Attribute{Key: headerVerificationPluginMinVersion, Value: version.GetVersion(), Critical: true})
 	// Test custom extended attribute
 	//ext = append(ext, signature.Attribute{Key: headerTimeStampSignature, Value: timestamp, Critical: true})
-	ext = append(ext, signature.Attribute{Key: "venafi-custom-attribute", Value: "test", Critical: false})
-
+	if x5u != "" {
+		// Add JWKS X5U attribute for identity validation during envelope signature verification.
+		// Requires TPP 23.1+
+		ext = append(ext, signature.Attribute{Key: HeaderVerificationPluginX5U, Value: x5u, Critical: false})
+	}
 	return ext
 }
 
@@ -129,7 +132,9 @@ func GenerateRFC3161TimeStampSignature(sig []byte) ([]byte, error) {
 	return resp, nil
 }
 
-func GenerateJWS(compact string, certs []*x509.Certificate, tsrRsp []byte) (*jwsEnvelope, error) {
+// func GenerateJWS(compact string, certs []*x509.Certificate, tsrRsp []byte) (*jwsEnvelope, error) {
+func GenerateJWS(compact string, certs []*x509.Certificate) (*jwsEnvelope, error) {
+
 	parts := strings.Split(compact, ".")
 	if len(parts) != 3 {
 		// this should never happen
@@ -147,9 +152,9 @@ func GenerateJWS(compact string, certs []*x509.Certificate, tsrRsp []byte) (*jws
 		Payload:   parts[1],
 		Signature: parts[2],
 		Header: jwsUnprotectedHeader{
-			TimestampSignature: tsrRsp,
-			CertChain:          rawCerts,
-			SigningAgent:       version.SigningAgent,
+			//TimestampSignature: tsrRsp,
+			CertChain:    rawCerts,
+			SigningAgent: version.SigningAgent,
 		},
 	}, nil
 }
@@ -174,29 +179,21 @@ func GetSignedAttributes(extendedAttributes []signature.Attribute, algorithm str
 		}
 	}
 
+	// Currently plugin only supports the x.509 Signing Scheme -> notary.x509
 	jwsProtectedHeader := jwsProtectedHeader{
 		Algorithm:     algorithm,
 		ContentType:   mediaTypePayloadV1,
 		SigningScheme: signature.SigningSchemeX509,
 	}
 
-	/*switch req.SigningScheme {
-	case signature.SigningSchemeX509:
-		jwsProtectedHeader.SigningTime = &req.SigningTime
-	case signature.SigningSchemeX509SigningAuthority:
-		crit = append(crit, headerKeyAuthenticSigningTime)
-		jwsProtectedHeader.AuthenticSigningTime = &req.SigningTime
-	default:
-		return nil, fmt.Errorf("unsupported SigningScheme: `%v`", req.SigningScheme)
-	}*/
-	// TODO Testing purposes only
+	// TODO Need to eventually move to signingAuthority scheme with CSP as trusted service for generating timestamp
+	// But for now generate the local current time.
 	t := time.Now()
 	jwsProtectedHeader.SigningTime = &t
 
-	// TODO
-	/*if !req.Expiry.IsZero() {
-		crit = append(crit, headerKeyExpiry)
-		jwsProtectedHeader.Expiry = &req.Expiry
+	// TODO Need to eventually support "best by use" header -> io.cncf.notary.expiry
+	/*
+		jwsProtectedHeader.Expiry = time.Now()
 	}*/
 
 	jwsProtectedHeader.Critical = crit

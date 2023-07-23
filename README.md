@@ -1,9 +1,9 @@
 [![Venafi](https://raw.githubusercontent.com/Venafi/.github/master/images/Venafi_logo.png)](https://www.venafi.com/)
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Community Supported](https://img.shields.io/badge/Support%20Level-Community-brightgreen)
-![Compatible with TPP 21.x](https://img.shields.io/badge/Compatibility-TPP%2021.x-f9a90c)
+![Compatible with TPP 22.x](https://img.shields.io/badge/Compatibility-TPP%2022.x-f9a90c)
 
-Venafi CodeSign Protect Signature Plugin for the Notary v2 [Notation CLI](https://github.com/notaryproject/notation).
+Venafi CodeSign Protect Signature and Verification Plugin for the Notary v2 [Notation CLI](https://github.com/notaryproject/notation).
 
 This is a WIP plugin that aims to be compliant with the plugin [spec](https://github.com/notaryproject/notaryproject/blob/main/specs/plugin-extensibility.md).
 
@@ -12,6 +12,18 @@ This is a WIP plugin that aims to be compliant with the plugin [spec](https://gi
 | ---- | --------- |
 | [JWS](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-jws.md) | :heavy_check_mark: |
 | [COSE Sign1](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-cose.md) | :x: |
+
+#### Plugin Spec Compatibility
+| Capability | Compatibility |
+| ---------- | ------------- |
+| keySpec | `RSA-2048`, `RSA-3072`, `RSA-4096`, `EC-256`, `EC-384`, `EC-521` |
+| hashAlgorithm | `SHA-256` |
+| signingAlgorithm | `RSASSA-PSS-SHA-256`, `ECDSA-SHA-256` |
+| pluginCapability | `SIGNATURE_GENERATOR.ENVELOPE`, `SIGNATURE_VERIFIER.TRUSTED_IDENTITY`, `SIGNATURE_VERIFIER.REVOCATION_CHECK` |
+| signatureEnvelopeType | `application/jose+json` ([JWS](https://datatracker.ietf.org/doc/html/rfc7515)) |
+| extendedAttributes | `com.venafi.notation.plugin.x5u` (only generated with TPP 23.1+ for experimental identity validation support)|
+| signingScheme | `notary.x509` |
+
 
 ## Getting Started:
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
@@ -130,3 +142,5 @@ notation verify $IMAGE
 ```bash
 Signature verification succeeded for sha256:73b3c3f2200bc6c161663b88b1fde3b3ed486518d6b6453fccdfdbbaefa09c7b
 ```
+
+*Note: Verification does perform additional checks such as verifying the revocation status of the code signing certificate, as well as validating that the certificate does exist in CodeSign Protec via PKS for identity validation purposes if using TPP 23.1+ (experimental).*
