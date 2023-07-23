@@ -32,6 +32,7 @@ require (
 )
 
 require (
+
 	github.com/cloudflare/cfssl v1.6.4
 	github.com/digitorus/timestamp v0.0.0-20230220124323-d542479a2425
 	github.com/notaryproject/notation-core-go v1.0.0-rc.4
