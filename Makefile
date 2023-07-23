@@ -36,6 +36,10 @@ cross:
 		$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); \
 	go build -trimpath -ldflags "$(LDFLAGS)" -o $(PLUGIN)-$(GOOS)-$(GOARCH) ./cmd/$(PLUGIN); \
 	shasum -a 256 $(PLUGIN)-$(GOOS)-$(GOARCH) > $(PLUGIN)-$(GOOS)-$(GOARCH).sha256 ))) \
+	go build -trimpath -ldflags "$(LDFLAGS)" -o $(PLUGIN)-darwin-arm64 ./cmd/$(PLUGIN)
+	shasum -a 256 $(PLUGIN)-darwin-arm64 > $(PLUGIN)-darwin-arm64.sha256
+	go build -trimpath -ldflags "$(LDFLAGS)" -o $(PLUGIN)-linux-arm64 ./cmd/$(PLUGIN)
+	shasum -a 256 $(PLUGIN)-linux-arm64 > $(PLUGIN)-linux-arm64.sha256
 
 .PHONY: download
 download: ## download dependencies via go mod
