@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
-	github.com/notaryproject/notation-go v1.0.0-rc.6
+	github.com/notaryproject/notation-go v1.0.0
 	github.com/venafi/vsign v1.0.2-0.20230722225009-faa05c2d8377
 )
 
@@ -32,10 +32,9 @@ require (
 )
 
 require (
-
 	github.com/cloudflare/cfssl v1.6.4
 	github.com/digitorus/timestamp v0.0.0-20230220124323-d542479a2425
-	github.com/notaryproject/notation-core-go v1.0.0-rc.4
+	github.com/notaryproject/notation-core-go v1.0.0
 	github.com/urfave/cli/v2 v2.25.3
 	golang.org/x/crypto v0.11.0
 )
