@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "Downloading notation version"
           curl -sL https://github.com/notaryproject/notation/releases/download/v${{ env.NOTATION_VERSION }}/notation_${{ env.NOTATION_VERSION }}_windows_amd64.zip -o notation.zip
-          Expand-Archive -Path notation.zip -DestinationPath .
+          Expand-Archive -Path notation.zip
       - name: run windows installer
         shell: pwsh
         run: |
@@ -32,5 +32,6 @@ jobs:
       - name: test plugin
         shell: cmd
         run: |
+          cd notation
           ./notation plugin ls
   
