@@ -29,8 +29,27 @@ This is a WIP plugin that aims to be compliant with the plugin [spec](https://gi
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
 - This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
-- Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.0.0-rc.4).  Version v1.0.0-rc.4 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
-- Install the notation-venafi-csp pluging for remote signing and verification:
+- Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.0.0-rc.7).  Version v1.0.0-rc.7 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
+
+## Installation
+
+Install the notation-venafi-csp plugin for remote signing and verification, depending on your requirements:
+
+
+#### Windows PowerShell
+- First, ensure you are using an administrative shell
+- Run the following command:
+  ```powershell
+  Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://github.com/venafi/notation-venafi-csp/install/install.ps1'))
+  ```
+
+#### MacOS and Linux
+- Run the following command:
+  ```bash
+  curl -sfL https://github.com/venafi/notation-venafi-csp/install/install.sh | sh -
+  ```
+
+#### Build and Install from Source
  ```bash
  git clone https://github.com/venafi/notation-venafi-csp.git
  cd notation-venafi-csp
