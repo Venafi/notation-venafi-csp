@@ -30,7 +30,7 @@ jobs:
           cd install
           ./install.ps1
       - name: test plugin
-        shell: cmd
+        shell: pwsh
         run: |
           cd notation
           ./notation plugin ls
