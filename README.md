@@ -5,13 +5,13 @@
 
 Venafi CodeSign Protect Signature and Verification Plugin for the Notary v2 [Notation CLI](https://github.com/notaryproject/notation).
 
-This is a WIP plugin that aims to be compliant with the plugin [spec](https://github.com/notaryproject/notaryproject/blob/main/specs/plugin-extensibility.md).
+This is a plugin that aims to be compliant with the plugin [spec](https://github.com/notaryproject/notaryproject/blob/main/specs/plugin-extensibility.md).
 
 #### Signature Format Compatibility
 | Type | Supported |
 | ---- | --------- |
 | [JWS](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-jws.md) | :heavy_check_mark: |
-| [COSE Sign1](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-cose.md) | :x: |
+| [COSE Sign1](https://github.com/notaryproject/notaryproject/blob/main/specs/signature-envelope-cose.md) | :heavy_check_mark: |
 
 #### Plugin Spec Compatibility
 | Capability | Compatibility |
@@ -20,7 +20,7 @@ This is a WIP plugin that aims to be compliant with the plugin [spec](https://gi
 | hashAlgorithm | `SHA-256` |
 | signingAlgorithm | `RSASSA-PSS-SHA-256`, `ECDSA-SHA-256` |
 | pluginCapability | `SIGNATURE_GENERATOR.ENVELOPE`, `SIGNATURE_VERIFIER.TRUSTED_IDENTITY`, `SIGNATURE_VERIFIER.REVOCATION_CHECK` |
-| signatureEnvelopeType | `application/jose+json` ([JWS](https://datatracker.ietf.org/doc/html/rfc7515)) |
+| signatureEnvelopeType | `application/jose+json` ([JWS](https://datatracker.ietf.org/doc/html/rfc7515)), `application/cose` ([COSE](https://datatracker.ietf.org/doc/rfc9052)) |
 | extendedAttributes | `com.venafi.notation.plugin.x5u` (only generated with TPP 23.1+ for experimental identity validation support)|
 | signingScheme | `notary.x509` |
 
@@ -29,7 +29,7 @@ This is a WIP plugin that aims to be compliant with the plugin [spec](https://gi
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
 - This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
-- Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.0.0-rc.7).  Version v1.0.0-rc.7 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
+- Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.0.0).  Version v1.0.0 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
 
 ## Installation
 
