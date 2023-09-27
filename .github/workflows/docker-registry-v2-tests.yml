@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: localhost:5000
-  NOTATION_VERSION: 1.0.0-rc.4
+  NOTATION_VERSION: 1.0.0
 
 jobs:
   docker-registry-v2-tests:
@@ -30,7 +30,9 @@ jobs:
         run: |
           docker run -d -p 5000:5000 --name registry registry:2
           docker build -t ${{ env.REGISTRY }}/net-monitor:v1 https://github.com/wabbit-networks/net-monitor.git#main
+          docker build -t ${{ env.REGISTRY}}/sample-venafi-csp-image:signed https://github.com/zosocanuck/sample-venafi-csp-pipeline.git#main
           docker image push ${{ env.REGISTRY }}/net-monitor:v1
+          docker image push ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
       - name: Create config.ini
         uses: DamianReeves/write-file-action@v1.2
         with:
@@ -58,5 +60,10 @@ jobs:
           export NOTATION_EXPERIMENTAL=1
           ./notation key add ${{ secrets.CERTIFICATE_LABEL }} --plugin venafi-csp --id ${{ secrets.CERTIFICATE_LABEL }} --plugin-config "config"="${{ github.workspace }}/config.ini"
           # notation certificate add --type ca --store ${{ secrets.DOMAIN }} ${{ github.workspace }}/vhroot.crt
-          ./notation sign -k ${{ secrets.CERTIFICATE_LABEL }} --signature-manifest=image ${{ env.REGISTRY }}/net-monitor:v1
+          echo "JWS envelope test"
+          ./notation sign -k ${{ secrets.CERTIFICATE_LABEL }} ${{ env.REGISTRY }}/net-monitor:v1
+          echo "COSE envelope test"
+          ./notation sign -k ${{ secrets.CERTIFICATE_LABEL }} --signature-format cose ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
+          ./notation inspect ${{ env.REGISTRY }}/net-monitor:v1
+          ./notation inspect ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
   

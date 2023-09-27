@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,8 +14,12 @@ import (
 	"time"
 
 	"github.com/digitorus/timestamp"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/notaryproject/notation-core-go/signature"
+	"github.com/notaryproject/notation-go/plugin/proto"
 	"github.com/venafi/notation-venafi-csp/internal/version"
+	c "github.com/venafi/vsign/pkg/crypto"
+	"github.com/venafi/vsign/pkg/endpoint"
 )
 
 const (
@@ -25,6 +31,7 @@ const (
 	headerVerificationPlugin           = "io.cncf.notary.verificationPlugin"
 	headerVerificationPluginMinVersion = "io.cncf.notary.verificationPluginMinVersion"
 	HeaderVerificationPluginX5U        = "com.venafi.notation.plugin.x5u"
+	defaultDigestAlg                   = "sha256"
 )
 
 // jwsUnprotectedHeader contains the set of unprotected headers.
@@ -84,6 +91,104 @@ type jwsEnvelope struct {
 	Signature string `json:"signature"`
 }
 
+func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
+	// Generate extended attributes
+	ext := GenerateExtendedAttributes(jwsOpts.X5u)
+
+	jwtAlg := certAlgToJWTAlg(jwsOpts.Mech)
+	// get all attributes ready to be signed
+	signedAttrs, err := getSignedAttributes(ext, jwtAlg)
+	if err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("payload unmarshal error: " + err.Error()),
+		}
+	}
+
+	// parse payload as jwt.MapClaims
+	// [jwt-go]: https://pkg.go.dev/github.com/dgrijalva/jwt-go#MapClaims
+	var payload jwt.MapClaims
+	if err = json.Unmarshal(jwsOpts.Req.Payload, &payload); err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("payload format error: %v" + err.Error()),
+		}
+	}
+
+	// generate token
+	token := jwt.NewWithClaims(jwt.GetSigningMethod(jwtAlg), payload)
+	token.Header = signedAttrs
+
+	var sstr string
+
+	if sstr, err = token.SigningString(); err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("jwt signing string error: %v" + err.Error()),
+		}
+	}
+
+	sig, err := jwsOpts.Connector.Sign(&endpoint.SignOption{
+		KeyID:     jwsOpts.Env.KeyID,
+		Mechanism: jwsOpts.Mech,
+		DigestAlg: defaultDigestAlg,
+		Payload:   []byte(sstr),
+		B64Flag:   false,
+		RawFlag:   false,
+	})
+
+	if err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("signing error: " + err.Error()),
+		}
+	}
+
+	compact := strings.Join([]string{sstr, base64.RawURLEncoding.EncodeToString(sig)}, ".")
+
+	// TODO need RFC3161 support within notation cli
+	/*tsrRsp, err := jws.GenerateRFC3161TimeStampSignature(sig)
+	if err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("timestamping error: " + err.Error()),
+		}
+	}*/
+
+	certs, err := c.ParseCertificates(jwsOpts.Env.CertificateChainData)
+	if err != nil {
+		return nil, err
+	}
+
+	// generate envelope
+	// envelope, err := jws.GenerateJWS(compact, certs, tsrRsp)
+	envelope, err := generateJWS(compact, certs)
+	if err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("invalid signature error: %v" + err.Error()),
+		}
+	}
+
+	encoded, err := json.Marshal(envelope)
+	if err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("invalid json encoding error: %v" + err.Error()),
+		}
+	}
+
+	if err != nil {
+		return nil, proto.RequestError{
+			Code: proto.ErrorCodeValidation,
+			Err:  errors.New("base64 decoding error: " + err.Error() + "[" + string(encoded) + "]"),
+		}
+	}
+
+	return encoded, nil
+
+}
+
 func GenerateExtendedAttributes(x5u string) []signature.Attribute {
 	// Need extended protected headers for plugin signature envelope verification
 	var ext []signature.Attribute
@@ -132,8 +237,7 @@ func GenerateRFC3161TimeStampSignature(sig []byte) ([]byte, error) {
 	return resp, nil
 }
 
-// func GenerateJWS(compact string, certs []*x509.Certificate, tsrRsp []byte) (*jwsEnvelope, error) {
-func GenerateJWS(compact string, certs []*x509.Certificate) (*jwsEnvelope, error) {
+func generateJWS(compact string, certs []*x509.Certificate) (*jwsEnvelope, error) {
 
 	parts := strings.Split(compact, ".")
 	if len(parts) != 3 {
@@ -160,7 +264,7 @@ func GenerateJWS(compact string, certs []*x509.Certificate) (*jwsEnvelope, error
 }
 
 // getSignerAttributes merge extended signed attributes and protected header to be signed attributes.
-func GetSignedAttributes(extendedAttributes []signature.Attribute, algorithm string) (map[string]interface{}, error) {
+func getSignedAttributes(extendedAttributes []signature.Attribute, algorithm string) (map[string]interface{}, error) {
 	extAttrs := make(map[string]interface{})
 	crit := []string{headerKeySigningScheme}
 
@@ -227,4 +331,15 @@ func mergeMaps(maps ...map[string]interface{}) (map[string]interface{}, error) {
 		}
 	}
 	return result, nil
+}
+
+func certAlgToJWTAlg(mech int) string {
+	switch mech {
+	case c.EcDsa:
+		return "ES256"
+	case c.RsaPkcsPss:
+		return "PS256"
+	default:
+		return ""
+	}
 }

@@ -3,7 +3,6 @@ module github.com/venafi/notation-venafi-csp
 go 1.19
 
 require (
-	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/notaryproject/notation-go v1.0.0
 	github.com/venafi/vsign v1.0.2-0.20230722225009-faa05c2d8377
 )
@@ -24,6 +23,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.16.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
+	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
@@ -34,7 +34,10 @@ require (
 require (
 	github.com/cloudflare/cfssl v1.6.4
 	github.com/digitorus/timestamp v0.0.0-20230220124323-d542479a2425
+	github.com/fxamacker/cbor/v2 v2.5.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/notaryproject/notation-core-go v1.0.0
 	github.com/urfave/cli/v2 v2.25.3
+	github.com/veraison/go-cose v1.1.0
 	golang.org/x/crypto v0.11.0
 )
