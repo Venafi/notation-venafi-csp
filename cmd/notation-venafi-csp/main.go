@@ -14,7 +14,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name:  "notation-venafi-csp",
-		Usage: "Notation - Notary V2 Venafi CodeSign Protect plugin",
+		Usage: "Notation Venafi CodeSign Protect plugin",
 		// TODO(zosocanuck) add version package
 		Version: version.GetVersion(),
 		Commands: []*cli.Command{

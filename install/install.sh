@@ -266,14 +266,14 @@ download_and_verify() {
 
     if installed_hash_matches; then
         info 'Skipping binary downloaded, installed notation-venafi-csp matches hash'
-        info "Follow the steps at ${GITHUB_URL} for configuring the Venafi CodeSign Protect plugin for notation (notary v2)"
+        info "Follow the steps at ${GITHUB_URL} for configuring the Venafi CodeSign Protect plugin for notation"
         return
     fi
 
     download_binary
     verify_binary
     setup_binary
-    info "Follow the steps at ${GITHUB_URL} for configuring the Venafi CodeSign Protect plugin for notation (notary v2)"
+    info "Follow the steps at ${GITHUB_URL} for configuring the Venafi CodeSign Protect plugin for notation"
 }
 
 # --- get hashes of the current notation-venafi-csp bin

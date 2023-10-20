@@ -3,7 +3,7 @@
 ![Community Supported](https://img.shields.io/badge/Support%20Level-Community-brightgreen)
 ![Compatible with TPP 22.x](https://img.shields.io/badge/Compatibility-TPP%2022.x-f9a90c)
 
-Venafi CodeSign Protect Signature and Verification Plugin for the Notary v2 [Notation CLI](https://github.com/notaryproject/notation).
+Venafi CodeSign Protect Signature and Verification Plugin for the [Notation CLI](https://github.com/notaryproject/notation).
 
 This is a plugin that aims to be compliant with the plugin [spec](https://github.com/notaryproject/notaryproject/blob/main/specs/plugin-extensibility.md).
 
@@ -84,7 +84,7 @@ notation ls $IMAGE
 ```
 
 - Create a trust policy
-In order to verify the container image, you need to configure the trust policy to specify trusted identities which sign the artifacts, and level of signature verification to use. See [trust policy](https://notaryproject.dev/docs/concepts/trust-store-trust-policy-specification/#trust-policy) spec to understand more about trust policy. 
+In order to verify the container image, you need to configure the trust policy to specify trusted identities which sign the artifacts, and level of signature verification to use. Follow the [Manage trust policies](https://notaryproject.dev/docs/user-guides/how-to/manage-trust-policy/) guide to understand and implement Notation trust policy. 
 
 ```
 {
@@ -105,12 +105,11 @@ In order to verify the container image, you need to configure the trust policy t
 }
 ```
 
-For a Linux user, store file trustpolicy.json under directory `$HOME/.config/notation/`.
+As an example, you can use `notation policy import` to import the trust policy configuration from the above JSON file:
 
-For a Mac user, store file trustpolicy.json under directory `$HOME/Library/Application Support/notation/`.
-
-For a Window user, store file trustpolicy.json under directory `C:\Users\<username>\AppData\Roaming\notation\`.
-
+```
+notation policy import ./trustpolicy.json
+```
 
 # Remotely sign with Venafi CodeSign Protect
 - Obtain certificate
