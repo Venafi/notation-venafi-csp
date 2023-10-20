@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-    Downloads and installs Venafi CodeSign Protect plugin for notation (notary v2) on the local machine.
+    Downloads and installs Venafi CodeSign Protect plugin for notation on the local machine.
 
     .DESCRIPTION
     Retrieves the Venafi CodeSign Protect plugin for the latest or a specified version, and
