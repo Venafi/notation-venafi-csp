@@ -34,7 +34,6 @@ var (
 )
 
 func setTLSConfig() error {
-	tlsConfig.InsecureSkipVerify = true
 	tlsConfig.Renegotiation = tls.RenegotiateFreelyAsClient
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tlsConfig
 	return nil
