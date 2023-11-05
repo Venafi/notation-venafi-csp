@@ -98,9 +98,10 @@ func Verify(ctx context.Context, req *proto.VerifySignatureRequest) (*proto.Veri
 		}
 		attr = append(attr, jws.HeaderVerificationPluginX5U)
 	} else {
+		// Venafi TPP 23.1+ and venafi notation plugin 0.2+
 		results[proto.CapabilityTrustedIdentityVerifier] = &proto.VerificationResult{
-			Success: true,
-			Reason:  "None",
+			Success: false,
+			Reason:  "Trusted Identity verification requires TPP 23.1+ and plugin 0.2+",
 		}
 	}
 
