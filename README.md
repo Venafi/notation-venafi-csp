@@ -1,7 +1,7 @@
 [![Venafi](https://raw.githubusercontent.com/Venafi/.github/master/images/Venafi_logo.png)](https://www.venafi.com/)
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Community Supported](https://img.shields.io/badge/Support%20Level-Community-brightgreen)
-![Compatible with TPP 22.x](https://img.shields.io/badge/Compatibility-TPP%2022.x-f9a90c)
+![Compatible with TPP 23.x](https://img.shields.io/badge/Compatibility-TPP%2023.x-f9a90c)
 
 Venafi CodeSign Protect Signature and Verification Plugin for the [Notation CLI](https://github.com/notaryproject/notation).
 
@@ -161,4 +161,4 @@ notation verify $IMAGE
 Signature verification succeeded for sha256:73b3c3f2200bc6c161663b88b1fde3b3ed486518d6b6453fccdfdbbaefa09c7b
 ```
 
-*Note: Verification does perform additional checks such as verifying the revocation status of the code signing certificate, as well as validating that the certificate does exist in CodeSign Protec via PKS for identity validation purposes if using TPP 23.1+ (experimental).*
+*Note: Verification does perform additional checks such as verifying the revocation status of the code signing certificate, as well as validating that the certificate does exist in CodeSign Protec via PKS for identity validation purposes when using TPP 23.1+.*
