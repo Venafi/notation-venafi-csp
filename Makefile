@@ -44,7 +44,7 @@ cross:
 .PHONY: distroless
 distroless: ## build ratify-enabled venafi notation plugin for linux/amd64
 	env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -o bin/distroless/$(PLUGIN) ./cmd/$(PLUGIN)
-	oras push ghcr.io/zosocanuck/notation-venafi-csp:linux-amd64-latest ./bin/distroless/notation-venafi-csp
+	oras push ghcr.io/venafi/notation-venafi-csp:linux-amd64-latest ./bin/distroless/notation-venafi-csp
 	
 .PHONY: download
 download: ## download dependencies via go mod
