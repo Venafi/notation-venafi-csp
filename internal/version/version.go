@@ -7,7 +7,7 @@ const (
 
 var (
 	// Version shows the current notation-venafi-csp version, optionally with pre-release.
-	Version = "0.2.0"
+	Version = "0.3.0"
 
 	// BuildMetadata stores the build metadata.
 	BuildMetadata = "release"

@@ -19,7 +19,14 @@ jobs:
       - name: build notation-venafi-csp
         run: |
           make cross
+          tar --no-xattrs --transform='flags=r;s|notation-venafi-csp-darwin-amd64|notation-venafi-csp|' -cvzf notation-venafi-csp-darwin-amd64.tar.gz notation-venafi-csp-darwin-amd64
+          tar --no-xattrs --transform='flags=r;s|notation-venafi-csp-darwin-arm64|notation-venafi-csp|' -cvzf notation-venafi-csp-darwin-arm64.tar.gz notation-venafi-csp-darwin-arm64
+          tar --no-xattrs --transform='flags=r;s|notation-venafi-csp-linux-amd64|notation-venafi-csp|' -cvzf notation-venafi-csp-linux-amd64.tar.gz notation-venafi-csp-linux-amd64
+          tar --no-xattrs --transform='flags=r;s|notation-venafi-csp-linux-arm64|notation-venafi-csp|' -cvzf notation-venafi-csp-linux-arm64.tar.gz notation-venafi-csp-linux-arm64
           mv notation-venafi-csp-windows-amd64 notation-venafi-csp-windows-amd64.exe
+          cp notation-venafi-csp-windows-amd64.exe notation-venafi-csp.exe
+          zip notation-venafi-csp-windows-amd64.zip notation-venafi-csp.exe
+          rm notation-venafi-csp.exe
       - name: Upload artifacts
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v3
