@@ -26,7 +26,12 @@ jobs:
           mv notation-venafi-csp-windows-amd64 notation-venafi-csp-windows-amd64.exe
           cp notation-venafi-csp-windows-amd64.exe notation-venafi-csp.exe
           zip notation-venafi-csp-windows-amd64.zip notation-venafi-csp.exe
-          rm notation-venafi-csp.exe
+          shasum -a 256 notation-venafi-csp-darwin-amd64.tar.gz > notation-venafi-csp-darwin-amd64.tar.gz.sha256
+          shasum -a 256 notation-venafi-csp-darwin-arm64.tar.gz > notation-venafi-csp-darwin-arm64.tar.gz.sha256
+          shasum -a 256 notation-venafi-csp-linux-amd64.tar.gz > notation-venafi-csp-linux-amd64.tar.gz.sha256
+          shasum -a 256 notation-venafi-csp-linux-arm64.tar.gz > notation-venafi-csp-linux-arm64.tar.gz.sha256
+          shasum -a 256 notation-venafi-csp-windows-amd64.zip > notation-venafi-csp-windows-amd64.zip.sha256
+          rm *.exe
       - name: Upload artifacts
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v3
