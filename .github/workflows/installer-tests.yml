@@ -7,11 +7,58 @@ on:
   pull_request:
 
 env:
-  NOTATION_VERSION: 1.0.1
+  NOTATION_VERSION: 1.1.0
+  PLUGIN_VERSION: 0.3.0
+  PLUGIN_LINUX_AMD64_SHA256: "03771794643f18c286b6db3a25a4d0b8e7c401e685b1e95a19f03c9356344f5a"
+  PLUGIN_DARWIN_AMD64_SHA256: "2b8293bdfc706a8acbb1fb3b3ce7b37a300d8c2f26e2ecf158db0104fc152348"
+  PLUGIN_WINDOWS_AMD64_SHA256: "81fd7e5b200a072c2fd69cf45d6e2de83930e3346debdcfd47c9c45d843d6b3e"
 
 jobs:
+  ubuntu-installer-test:
+    name: Ubuntu installer test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Setup notation CLI
+        uses: notaryproject/notation-action/setup@v1
+        with:
+          version: ${{ env.NOTATION_VERSION }}
+      - name: Install Venafi plugin
+        run: |
+          notation plugin install --url https://github.com/Venafi/notation-venafi-csp/releases/download/v${{ env.PLUGIN_VERSION }}/notation-venafi-csp-linux-amd64.tar.gz --sha256sum ${{ env.PLUGIN_LINUX_AMD64_SHA256 }}
+          notation plugin ls
+  macos-installer-test:
+    name: MacOS installer test
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Setup notation CLI
+        uses: notaryproject/notation-action/setup@v1
+        with:
+          version: ${{ env.NOTATION_VERSION }}
+      - name: Install Venafi plugin
+        run: |
+          notation plugin install --url https://github.com/Venafi/notation-venafi-csp/releases/download/v${{ env.PLUGIN_VERSION }}/notation-venafi-csp-darwin-amd64.tar.gz --sha256sum ${{ env.PLUGIN_DARWIN_AMD64_SHA256 }}
+          notation plugin ls
   windows-installer-test:
-    name: Run tests
+      name: Windows installer test
+      runs-on: windows-latest
+      permissions:
+        contents: read
+      steps:
+        - name: Setup notation CLI
+          uses: notaryproject/notation-action/setup@v1
+          with:
+            version: ${{ env.NOTATION_VERSION }}
+        - name: Install Venafi plugin
+          run: |
+            notation plugin install --url https://github.com/Venafi/notation-venafi-csp/releases/download/v${{ env.PLUGIN_VERSION }}/notation-venafi-csp-darwin-amd64.tar.gz --sha256sum ${{ env.PLUGIN_WINDOWS_AMD64_SHA256 }}
+            notation plugin ls
+
+  windows-old-installer-test:
+    name: Windows (OLD) installer test
     runs-on: windows-latest
     permissions:
       contents: read
