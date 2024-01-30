@@ -56,29 +56,4 @@ jobs:
           run: |
             notation plugin install --url https://github.com/Venafi/notation-venafi-csp/releases/download/v${{ env.PLUGIN_VERSION }}/notation-venafi-csp-darwin-amd64.tar.gz --sha256sum ${{ env.PLUGIN_WINDOWS_AMD64_SHA256 }}
             notation plugin ls
-
-  windows-old-installer-test:
-    name: Windows (OLD) installer test
-    runs-on: windows-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v3
-      - name: download notation
-        shell: pwsh
-        run: |
-          echo "Downloading notation version"
-          curl -sL https://github.com/notaryproject/notation/releases/download/v${{ env.NOTATION_VERSION }}/notation_${{ env.NOTATION_VERSION }}_windows_amd64.zip -o notation.zip
-          Expand-Archive -Path notation.zip
-      - name: run windows installer
-        shell: pwsh
-        run: |
-          # Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://github.com/venafi/notation-venafi-csp/install/install.ps1')) 
-          cd install
-          ./install.ps1
-      - name: test plugin
-        shell: pwsh
-        run: |
-          cd notation
-          ./notation plugin ls
   
