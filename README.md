@@ -29,25 +29,18 @@ This is a plugin that aims to be compliant with the plugin [spec](https://github
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
 - This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
-- Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.0.1).  Version v1.0.1 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
+- Install notation [CLI](https://github.com/notaryproject/notation/releases/tag/v1.1.0).  Version v1.1.0 has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
 
 ## Installation
 
-Install the notation-venafi-csp plugin for remote signing and verification, depending on your requirements:
+Install the notation-venafi-csp plugin for remote signing and verification, using the `notation plugin install` command:
 
+```bash
+notation plugin install --url https://github.com/Venafi/notation-venafi-csp/releases/download/v0.3.0/notation-venafi-csp-linux-amd64.tar.gz --sha256sum 03771794643f18c286b6db3a25a4d0b8e7c401e685b1e95a19f03c9356344f5a
 
-#### Windows PowerShell
-- First, ensure you are using an administrative shell
-- Run the following command:
-  ```powershell
-  Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://github.com/venafi/notation-venafi-csp/install/install.ps1'))
-  ```
+```
 
-#### MacOS and Linux
-- Run the following command:
-  ```bash
-  curl -sfL https://github.com/venafi/notation-venafi-csp/install/install.sh | sh -
-  ```
+Adjust the `--url` and `--sha256sum` parameters based on the release and platform you are deploying the plugin for.
 
 #### Build and Install from Source
  ```bash
