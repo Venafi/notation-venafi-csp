@@ -144,8 +144,9 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 
 	return nil, proto.RequestError{
 		Code: proto.ErrorCodeValidation,
-		Err:  errors.New("error during signing operation: " + err.Error()),
+		Err:  errors.New("unknown error during signing operation"),
 	}
+
 }
 
 func certAlgToMech(cert *x509.Certificate) int {

@@ -72,7 +72,7 @@ func Key(ctx context.Context, req *proto.DescribeKeyRequest) (*proto.DescribeKey
 
 	return nil, proto.RequestError{
 		Code: proto.ErrorCodeValidation,
-		Err:  errors.New("describe key request error: " + err.Error()),
+		Err:  errors.New("unknown describe key request error"),
 	}
 }
 

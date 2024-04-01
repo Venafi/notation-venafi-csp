@@ -178,13 +178,6 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 		}
 	}
 
-	if err != nil {
-		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
-			Err:  errors.New("base64 decoding error: " + err.Error() + "[" + string(encoded) + "]"),
-		}
-	}
-
 	return encoded, nil
 
 }
@@ -193,7 +186,7 @@ func GenerateExtendedAttributes(x5u string) []signature.Attribute {
 	// Need extended protected headers for plugin signature envelope verification
 	var ext []signature.Attribute
 	ext = append(ext, signature.Attribute{Key: headerVerificationPlugin, Value: version.PluginName, Critical: true})
-	ext = append(ext, signature.Attribute{Key: headerVerificationPluginMinVersion, Value: version.GetVersion(), Critical: true})
+	ext = append(ext, signature.Attribute{Key: headerVerificationPluginMinVersion, Value: version.GetVerificationPluginMinVersion(), Critical: true})
 	// Test custom extended attribute
 	//ext = append(ext, signature.Attribute{Key: headerTimeStampSignature, Value: timestamp, Critical: true})
 	if x5u != "" {
