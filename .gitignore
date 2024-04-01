@@ -25,3 +25,7 @@ bin/
 
 # config files
 test/config.ini
+
+# demo scripts/files
+test/kubecon-eu-2024-demo.sh
+test/trustpolicy-kubecon.json

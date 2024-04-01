@@ -7,10 +7,11 @@ const (
 
 var (
 	// Version shows the current notation-venafi-csp version, optionally with pre-release.
-	Version = "0.3.0"
+	Version                      = "0.3.1"
+	VerificationPluginMinVersion = "0.2.0"
 
 	// BuildMetadata stores the build metadata.
-	BuildMetadata = "release"
+	BuildMetadata = ""
 )
 
 // GetVersion returns the version string in SemVer 2.
@@ -19,4 +20,11 @@ func GetVersion() string {
 		return Version
 	}
 	return Version + "-" + BuildMetadata
+}
+
+func GetVerificationPluginMinVersion() string {
+	if BuildMetadata == "" {
+		return VerificationPluginMinVersion
+	}
+	return VerificationPluginMinVersion + "-" + BuildMetadata
 }
