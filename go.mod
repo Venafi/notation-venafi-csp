@@ -37,7 +37,7 @@ require (
 require (
 	github.com/cloudflare/cfssl v1.6.4
 	github.com/digitorus/timestamp v0.0.0-20230220124323-d542479a2425
-	github.com/fxamacker/cbor/v2 v2.5.0
+	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/notaryproject/notation-core-go v1.0.2
