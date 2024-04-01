@@ -4,13 +4,13 @@ go 1.21
 
 require (
 	github.com/notaryproject/notation-go v1.1.0
-	github.com/venafi/vsign v1.0.2-0.20230722225009-faa05c2d8377
+	github.com/venafi/vsign v1.0.2
 )
 
 require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/digitorus/pkcs7 v0.0.0-20230220124406-51331ccfc40f // indirect
+	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
 	github.com/google/certificate-transparency-go v1.1.6 // indirect
@@ -36,7 +36,7 @@ require (
 
 require (
 	github.com/cloudflare/cfssl v1.6.4
-	github.com/digitorus/timestamp v0.0.0-20230220124323-d542479a2425
+	github.com/digitorus/timestamp v0.0.0-20230821155606-d1ad5ca9624c
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/golang-jwt/jwt/v4 v4.5.0
