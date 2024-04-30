@@ -9,7 +9,7 @@ require (
 
 require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
@@ -29,7 +29,7 @@ require (
 	github.com/spf13/viper v1.18.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
+	github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/sys v0.19.0 // indirect
@@ -45,7 +45,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/notaryproject/notation-core-go v1.0.2
-	github.com/urfave/cli/v2 v2.27.1
+	github.com/urfave/cli/v2 v2.27.2
 	github.com/veraison/go-cose v1.1.0
 	golang.org/x/crypto v0.22.0
 )
