@@ -60,8 +60,8 @@ github.com/magiconair/properties v1.8.7 h1:IeQXZAiQcpL9mgcAe1Nu6cX9LLw6ExEHKjN0V
 github.com/magiconair/properties v1.8.7/go.mod h1:Dhd985XPs7jluiymwWYZ0G4Z61jb3vdS329zhj2hYo0=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/notaryproject/notation-core-go v1.0.2 h1:VEt+mbsgdANd9b4jqgmx2C7U0DmwynOuD2Nhxh3bANw=
-github.com/notaryproject/notation-core-go v1.0.2/go.mod h1:2HkQzUwg08B3x9oVIztHsEh7Vil2Rj+tYgxH+JObLX4=
+github.com/notaryproject/notation-core-go v1.0.3 h1:FCgvULSypEFrrNgvDRdHbKAGAgbXK43n/jKD9q2WECA=
+github.com/notaryproject/notation-core-go v1.0.3/go.mod h1:eDo5/LTUp23mB7w0CckJLnl+p93oGdyiKDzzggpqTH4=
 github.com/notaryproject/notation-go v1.1.0 h1:7WBeH8FGoA+GkeUwmBIBnlJc/PpdYaUKfiXu6ZZeEeg=
 github.com/notaryproject/notation-go v1.1.0/go.mod h1:ZSk34URQar5fnWflaFByzpDvuefgZKm/mp8Q2tQpBaw=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=

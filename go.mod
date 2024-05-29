@@ -44,7 +44,7 @@ require (
 	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/notaryproject/notation-core-go v1.0.2
+	github.com/notaryproject/notation-core-go v1.0.3
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/veraison/go-cose v1.1.0
 	golang.org/x/crypto v0.23.0
