@@ -3,7 +3,7 @@ module github.com/venafi/notation-venafi-csp
 go 1.21
 
 require (
-	github.com/notaryproject/notation-go v1.1.0
+	github.com/notaryproject/notation-go v1.1.1
 	github.com/venafi/vsign v1.0.3-0.20240401203238-73aa00d811aa
 )
 
@@ -18,6 +18,7 @@ require (
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/notaryproject/notation-plugin-framework-go v1.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
@@ -44,7 +45,7 @@ require (
 	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/notaryproject/notation-core-go v1.0.2
+	github.com/notaryproject/notation-core-go v1.0.3
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/veraison/go-cose v1.1.0
 	golang.org/x/crypto v0.23.0
