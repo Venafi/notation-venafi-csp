@@ -48,8 +48,6 @@ jobs:
           cp bin/notation-venafi-csp ~/.config/notation/plugins/venafi-csp/
       - name: setup Notation CLI
         uses: notaryproject/notation-action/setup@v1
-        with:
-          version: ${{ env.NOTATION_VERSION }}
       - name: Sign with notation
         run: |
           notation key add ${{ secrets.CERTIFICATE_LABEL }} --plugin venafi-csp --id ${{ secrets.CERTIFICATE_LABEL }} --plugin-config "config"="${{ github.workspace }}/config.ini"
