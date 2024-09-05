@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: localhost:5000
-  NOTATION_VERSION: 1.0.1
+  NOTATION_VERSION: 1.2.0
 
 jobs:
   docker-registry-v2-tests:
@@ -41,29 +41,21 @@ jobs:
             tpp_url=${{ secrets.TPP_URL }}
             access_token=${{ secrets.ACCESS_TOKEN }}
             tpp_project=${{ secrets.TPP_PROJECT }}
-      #- name: Create vhroot cert file
-      #  uses: DamianReeves/write-file-action@v1.2
-      #  with:
-      #    path: ${{ github.workspace }}/vhroot.crt
-      #    contents: ${{ secrets.ROOT_CERT }}
       - name: build notation-venafi-csp plugin
         run: |
           make build
           mkdir -p  ~/.config/notation/plugins/venafi-csp
           cp bin/notation-venafi-csp ~/.config/notation/plugins/venafi-csp/
-          echo "Downloading notation version"
-          curl -sL https://github.com/notaryproject/notation/releases/download/v${{ env.NOTATION_VERSION }}/notation_${{ env.NOTATION_VERSION }}_linux_amd64.tar.gz -o notation.tar.gz
-          tar xvf notation.tar.gz
-          chmod +x notation
+      - name: setup Notation CLI
+        uses: notaryproject/notation-action/setup@v1
       - name: Sign with notation
         run: |
-          export NOTATION_EXPERIMENTAL=1
-          ./notation key add ${{ secrets.CERTIFICATE_LABEL }} --plugin venafi-csp --id ${{ secrets.CERTIFICATE_LABEL }} --plugin-config "config"="${{ github.workspace }}/config.ini"
+          notation key add ${{ secrets.CERTIFICATE_LABEL }} --plugin venafi-csp --id ${{ secrets.CERTIFICATE_LABEL }} --plugin-config "config"="${{ github.workspace }}/config.ini"
           # notation certificate add --type ca --store ${{ secrets.DOMAIN }} ${{ github.workspace }}/vhroot.crt
           echo "JWS envelope test"
-          ./notation sign -k ${{ secrets.CERTIFICATE_LABEL }} ${{ env.REGISTRY }}/net-monitor:v1
+          notation sign -k ${{ secrets.CERTIFICATE_LABEL }} ${{ env.REGISTRY }}/net-monitor:v1
           echo "COSE envelope test"
-          ./notation sign -k ${{ secrets.CERTIFICATE_LABEL }} --signature-format cose ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
-          ./notation inspect ${{ env.REGISTRY }}/net-monitor:v1
-          ./notation inspect ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
+          notation sign -k ${{ secrets.CERTIFICATE_LABEL }} --signature-format cose ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
+          notation inspect ${{ env.REGISTRY }}/net-monitor:v1
+          notation inspect ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
   
