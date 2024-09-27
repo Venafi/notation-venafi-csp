@@ -50,6 +50,6 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/notaryproject/notation-core-go v1.1.0
 	github.com/urfave/cli/v2 v2.27.4
-	github.com/veraison/go-cose v1.1.0
+	github.com/veraison/go-cose v1.3.0
 	golang.org/x/crypto v0.27.0
 )
