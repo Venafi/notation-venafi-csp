@@ -11,7 +11,7 @@ require (
 
 require (
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
@@ -49,7 +49,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/notaryproject/notation-core-go v1.1.0
-	github.com/urfave/cli/v2 v2.27.4
+	github.com/urfave/cli/v2 v2.27.5
 	github.com/veraison/go-cose v1.3.0
 	golang.org/x/crypto v0.28.0
 )
