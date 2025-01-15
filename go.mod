@@ -21,7 +21,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/notaryproject/notation-plugin-framework-go v1.0.0 // indirect
-	github.com/notaryproject/tspclient-go v0.2.0 // indirect
+	github.com/notaryproject/tspclient-go v1.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
@@ -48,7 +48,7 @@ require (
 	github.com/fxamacker/cbor/v2 v2.7.0
 	github.com/go-ldap/ldap/v3 v3.4.10
 	github.com/golang-jwt/jwt/v4 v4.5.1
-	github.com/notaryproject/notation-core-go v1.1.0
+	github.com/notaryproject/notation-core-go v1.2.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/veraison/go-cose v1.3.0
 	golang.org/x/crypto v0.32.0
