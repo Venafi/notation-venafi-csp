@@ -1,11 +1,10 @@
 module github.com/venafi/notation-venafi-csp
 
 go 1.22
-
 toolchain go1.22.7
 
 require (
-	github.com/notaryproject/notation-go v1.2.1
+	github.com/notaryproject/notation-go v1.3.0
 	github.com/venafi/vsign v1.0.3-0.20240401203238-73aa00d811aa
 )
 
