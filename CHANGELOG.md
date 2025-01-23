@@ -1,3 +1,10 @@
+# v0.3.2
+
+## Enhancements
+
+* Deprecate revocation checks due to native support in notation 1.3.0
+
+
 # v0.3.1
 
 ## Bug Fixes

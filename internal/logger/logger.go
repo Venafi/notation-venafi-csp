@@ -5,13 +5,14 @@ import (
 	"os"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 )
 
 func Log(filename string, data string) error {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("logging error: " + err.Error()),
 		}
 	}
@@ -19,7 +20,7 @@ func Log(filename string, data string) error {
 
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("logging error: " + err.Error()),
 		}
 	}
@@ -31,7 +32,7 @@ func LogBytes(filename string, data []byte) error {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("logging error: " + err.Error()),
 		}
 	}
@@ -39,7 +40,7 @@ func LogBytes(filename string, data []byte) error {
 
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("logging error: " + err.Error()),
 		}
 	}

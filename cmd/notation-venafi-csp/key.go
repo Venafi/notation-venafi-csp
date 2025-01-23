@@ -7,13 +7,14 @@ import (
 	"os"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 	"github.com/venafi/notation-venafi-csp/internal/signature"
 
 	"github.com/urfave/cli/v2"
 )
 
 var describeKeyCommand = &cli.Command{
-	Name:   string(proto.CommandDescribeKey),
+	Name:   string(plugin.CommandDescribeKey),
 	Usage:  "CodeSign Protect key description",
 	Action: runDescribeKey,
 	Flags: []cli.Flag{
@@ -33,18 +34,18 @@ func runDescribeKey(ctx *cli.Context) error {
 		r, err = os.Open(f)
 		if err != nil {
 			return proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  fmt.Errorf("failed to open reader: %w", err),
 			}
 		}
 	} else {
 		r = os.Stdin
 	}
-	var req proto.DescribeKeyRequest
+	var req plugin.DescribeKeyRequest
 	err := json.NewDecoder(r).Decode(&req)
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  fmt.Errorf("failed to unmarshal request input: %w", err),
 		}
 	}
@@ -52,7 +53,7 @@ func runDescribeKey(ctx *cli.Context) error {
 	resp, err := signature.Key(ctx.Context, &req)
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  fmt.Errorf("describe-key error: %w", err),
 		}
 	}
@@ -60,7 +61,7 @@ func runDescribeKey(ctx *cli.Context) error {
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  fmt.Errorf("failed to marshal response: %w", err),
 		}
 	}

@@ -5,13 +5,14 @@ import (
 	"errors"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 	"github.com/venafi/vsign/pkg/vsign"
 )
 
-func Key(ctx context.Context, req *proto.DescribeKeyRequest) (*proto.DescribeKeyResponse, error) {
+func Key(ctx context.Context, req *plugin.DescribeKeyRequest) (*plugin.DescribeKeyResponse, error) {
 	if req == nil || req.KeyID == "" {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("invalid request input"),
 		}
 	}
@@ -19,7 +20,7 @@ func Key(ctx context.Context, req *proto.DescribeKeyRequest) (*proto.DescribeKey
 	err := setTLSConfig()
 	if err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("error setting TLS config"),
 		}
 	}
@@ -29,7 +30,7 @@ func Key(ctx context.Context, req *proto.DescribeKeyRequest) (*proto.DescribeKey
 		cfg, err := vsign.BuildConfig(ctx, path)
 		if err != nil {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("error building config"),
 			}
 		}
@@ -39,7 +40,7 @@ func Key(ctx context.Context, req *proto.DescribeKeyRequest) (*proto.DescribeKey
 		//logger.Log("/Users/ivan.wallis/notation.log", err.Error())
 		if err != nil {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("unable to connect"),
 			}
 			//fmt.Printf("Unable to connect to %s: %s", cfg.ConnectorType, err)
@@ -52,7 +53,7 @@ func Key(ctx context.Context, req *proto.DescribeKeyRequest) (*proto.DescribeKey
 		keyAlg, err := connector.GetEnvironmentKeyAlgorithm()
 		if err != nil {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("get environment algorithm error: " + err.Error()),
 			}
 		}
@@ -60,23 +61,23 @@ func Key(ctx context.Context, req *proto.DescribeKeyRequest) (*proto.DescribeKey
 		keySpec := certToKeySpec(keyAlg)
 		if keySpec == "" {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("unrecognized key spec: " + keyAlg),
 			}
 		}
-		return &proto.DescribeKeyResponse{
+		return &plugin.DescribeKeyResponse{
 			KeyID:   req.KeyID,
 			KeySpec: keySpec,
 		}, nil
 	}
 
 	return nil, proto.RequestError{
-		Code: proto.ErrorCodeValidation,
+		Code: plugin.ErrorCodeValidation,
 		Err:  errors.New("unknown describe key request error"),
 	}
 }
 
-func certToKeySpec(alg string) proto.KeySpec {
+func certToKeySpec(alg string) plugin.KeySpec {
 	switch alg {
 	case "RSA2048":
 		return proto.KeySpecRSA2048

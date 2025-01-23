@@ -8,6 +8,7 @@ import (
 	"github.com/venafi/notation-venafi-csp/internal/version"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 	"github.com/urfave/cli/v2"
 )
 
@@ -28,7 +29,7 @@ func main() {
 		var reer proto.RequestError
 		if !errors.As(err, &reer) {
 			err = proto.RequestError{
-				Code: proto.ErrorCodeGeneric,
+				Code: plugin.ErrorCodeGeneric,
 				Err:  err,
 			}
 		}

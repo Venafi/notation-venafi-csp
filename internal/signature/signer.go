@@ -15,6 +15,7 @@ import (
 	"crypto/x509"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 	"github.com/venafi/notation-venafi-csp/internal/logger"
 	"github.com/venafi/notation-venafi-csp/internal/signature/cose"
 	"github.com/venafi/notation-venafi-csp/internal/signature/jws"
@@ -39,13 +40,13 @@ func setTLSConfig() error {
 	return nil
 }
 
-func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*proto.GenerateEnvelopeResponse, error) {
+func SignEnvelope(ctx context.Context, req *plugin.GenerateEnvelopeRequest) (*plugin.GenerateEnvelopeResponse, error) {
 	if req == nil || req.KeyID == "" || req.PayloadType == "" || req.SignatureEnvelopeType == "" || len(req.PluginConfig) == 0 {
 		for key, value := range req.PluginConfig {
 			return nil, logger.Log("notation.log", key+"="+value)
 		}
-		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+		return nil, &proto.RequestError{
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("invalid request input"),
 		}
 	}
@@ -53,7 +54,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 	err := setTLSConfig()
 	if err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("error setting TLS config"),
 		}
 	}
@@ -64,7 +65,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 		cfg, err := vsign.BuildConfig(ctx, path)
 		if err != nil {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("error building TPP config"),
 			}
 		}
@@ -72,7 +73,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 		connector, err := vsign.NewClient(&cfg)
 		if err != nil {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("unable to connect to TPP Server: " + cfg.BaseUrl),
 			}
 
@@ -81,7 +82,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 		env, err := connector.GetEnvironment()
 		if err != nil {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("CSP Get Environment Error: " + err.Error()),
 			}
 		}
@@ -89,7 +90,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 		certs, err := c.ParseCertificates(env.CertificateChainData)
 		if err != nil {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("certificate parsing error: " + err.Error()),
 			}
 		}
@@ -97,7 +98,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 		mech := certAlgToMech(certs[0])
 		if mech == 0 {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("unrecognized signing algorithm"),
 			}
 		}
@@ -109,7 +110,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 		x5u, err := connector.GetJwksX5u(certs[0])
 		if err != nil && err != verror.UnSupportedAPI {
 			return nil, proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("error obtaining jwks x5u"),
 			}
 		}
@@ -118,7 +119,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 			encoded, err = cose.SignCOSEEnvelope(cose.COSEOptions{Connector: connector, Env: env, Mech: mech, X5u: x5u, Req: req})
 			if err != nil {
 				return nil, proto.RequestError{
-					Code: proto.ErrorCodeValidation,
+					Code: plugin.ErrorCodeValidation,
 					Err:  errors.New("signing error: " + err.Error()),
 				}
 			}
@@ -127,14 +128,14 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 			encoded, err = jws.SignJWSEnvelope(jws.JWSOptions{Connector: connector, Env: env, Mech: mech, X5u: x5u, Req: req})
 			if err != nil {
 				return nil, proto.RequestError{
-					Code: proto.ErrorCodeValidation,
+					Code: plugin.ErrorCodeValidation,
 					Err:  errors.New("signing error: " + err.Error()),
 				}
 			}
 			envelopeType = signatureEnvelopeTypeJOSE
 		}
 
-		var sigEnvelopeResponse = &proto.GenerateEnvelopeResponse{
+		var sigEnvelopeResponse = &plugin.GenerateEnvelopeResponse{
 			SignatureEnvelope:     encoded,
 			SignatureEnvelopeType: envelopeType,
 		}
@@ -143,7 +144,7 @@ func SignEnvelope(ctx context.Context, req *proto.GenerateEnvelopeRequest) (*pro
 	}
 
 	return nil, proto.RequestError{
-		Code: proto.ErrorCodeValidation,
+		Code: plugin.ErrorCodeValidation,
 		Err:  errors.New("unknown error during signing operation"),
 	}
 
