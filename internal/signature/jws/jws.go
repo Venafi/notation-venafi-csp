@@ -17,6 +17,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/notaryproject/notation-core-go/signature"
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 	"github.com/venafi/notation-venafi-csp/internal/version"
 	c "github.com/venafi/vsign/pkg/crypto"
 	"github.com/venafi/vsign/pkg/endpoint"
@@ -100,7 +101,7 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 	signedAttrs, err := getSignedAttributes(ext, jwtAlg)
 	if err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("payload unmarshal error: " + err.Error()),
 		}
 	}
@@ -110,7 +111,7 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 	var payload jwt.MapClaims
 	if err = json.Unmarshal(jwsOpts.Req.Payload, &payload); err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("payload format error: %v" + err.Error()),
 		}
 	}
@@ -123,7 +124,7 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 
 	if sstr, err = token.SigningString(); err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("jwt signing string error: %v" + err.Error()),
 		}
 	}
@@ -139,7 +140,7 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 
 	if err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("signing error: " + err.Error()),
 		}
 	}
@@ -165,7 +166,7 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 	envelope, err := generateJWS(compact, certs)
 	if err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("invalid signature error: %v" + err.Error()),
 		}
 	}
@@ -173,7 +174,7 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 	encoded, err := json.Marshal(envelope)
 	if err != nil {
 		return nil, proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  errors.New("invalid json encoding error: %v" + err.Error()),
 		}
 	}

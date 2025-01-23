@@ -1,7 +1,7 @@
 package cose
 
 import (
-	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 	"github.com/venafi/vsign/pkg/endpoint"
 )
 
@@ -10,5 +10,5 @@ type COSEOptions struct {
 	Env       endpoint.Environment
 	Mech      int
 	X5u       string
-	Req       *proto.GenerateEnvelopeRequest
+	Req       *plugin.GenerateEnvelopeRequest
 }

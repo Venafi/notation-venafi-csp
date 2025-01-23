@@ -8,12 +8,13 @@ import (
 	"os"
 
 	"github.com/notaryproject/notation-go/plugin/proto"
+	"github.com/notaryproject/notation-plugin-framework-go/plugin"
 	"github.com/urfave/cli/v2"
 	"github.com/venafi/notation-venafi-csp/internal/signature"
 )
 
 var verifyCommand = &cli.Command{
-	Name:   string(proto.CommandVerifySignature),
+	Name:   string(plugin.CommandVerifySignature),
 	Usage:  "Verifies artifact signatures produced by Venafi CodeSign Protect",
 	Action: runVerify,
 	Flags: []cli.Flag{
@@ -34,18 +35,18 @@ func runVerify(ctx *cli.Context) error {
 		r, err = os.Open(f)
 		if err != nil {
 			return proto.RequestError{
-				Code: proto.ErrorCodeValidation,
+				Code: plugin.ErrorCodeValidation,
 				Err:  fmt.Errorf("failed to open reader: %w", err),
 			}
 		}
 	} else {
 		r = os.Stdin
 	}
-	var req proto.VerifySignatureRequest
+	var req plugin.VerifySignatureRequest
 	err := json.NewDecoder(r).Decode(&req)
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  fmt.Errorf("failed to unmarshal request input: %w", err),
 		}
 	}
@@ -61,7 +62,7 @@ func runVerify(ctx *cli.Context) error {
 	jsonResp, err := json.Marshal(resp)
 	if err != nil {
 		return proto.RequestError{
-			Code: proto.ErrorCodeValidation,
+			Code: plugin.ErrorCodeValidation,
 			Err:  fmt.Errorf("failed to marshal response: %w", err),
 		}
 	}
