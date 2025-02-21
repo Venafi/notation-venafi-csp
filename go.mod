@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.23.4
 
 require (
-	github.com/notaryproject/notation-go v1.3.0
+	github.com/notaryproject/notation-go v1.3.1
 	github.com/venafi/vsign v1.0.3-0.20240401203238-73aa00d811aa
 )
 
