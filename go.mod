@@ -1,8 +1,8 @@
 module github.com/venafi/notation-venafi-csp
 
-go 1.22.0
+go 1.23.0
 
-toolchain go1.23.4
+toolchain go1.23.5
 
 require (
 	github.com/notaryproject/notation-go v1.3.1
@@ -51,5 +51,5 @@ require (
 	github.com/notaryproject/notation-plugin-framework-go v1.0.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/veraison/go-cose v1.3.0
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.35.0
 )
