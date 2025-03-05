@@ -49,7 +49,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/notaryproject/notation-core-go v1.2.0
 	github.com/notaryproject/notation-plugin-framework-go v1.0.0
-	github.com/urfave/cli/v2 v2.27.5
+	github.com/urfave/cli/v2 v2.27.6
 	github.com/veraison/go-cose v1.3.0
 	golang.org/x/crypto v0.36.0
 )
