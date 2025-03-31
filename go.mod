@@ -2,7 +2,7 @@ module github.com/venafi/notation-venafi-csp
 
 go 1.23.0
 
-toolchain go1.23.5
+toolchain go1.24.1
 
 require (
 	github.com/notaryproject/notation-go v1.3.1
@@ -44,7 +44,7 @@ require (
 require (
 	github.com/cloudflare/cfssl v1.6.5
 	github.com/digitorus/timestamp v0.0.0-20231217203849-220c5c2851b7
-	github.com/fxamacker/cbor/v2 v2.7.0
+	github.com/fxamacker/cbor/v2 v2.8.0
 	github.com/go-ldap/ldap/v3 v3.4.10
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/notaryproject/notation-core-go v1.2.0
