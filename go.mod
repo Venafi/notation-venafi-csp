@@ -14,7 +14,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-asn1-ber/asn1-ber v1.5.7 // indirect
+	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
 	github.com/google/certificate-transparency-go v1.1.7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
@@ -45,7 +45,7 @@ require (
 	github.com/cloudflare/cfssl v1.6.5
 	github.com/digitorus/timestamp v0.0.0-20231217203849-220c5c2851b7
 	github.com/fxamacker/cbor/v2 v2.8.0
-	github.com/go-ldap/ldap/v3 v3.4.10
+	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/notaryproject/notation-core-go v1.2.0
 	github.com/notaryproject/notation-plugin-framework-go v1.0.0
