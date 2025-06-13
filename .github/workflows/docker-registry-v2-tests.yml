@@ -9,6 +9,12 @@ on:
 env:
   REGISTRY: localhost:5000
   NOTATION_VERSION: 1.2.0
+  RSA2048_CERT_PROJECT: vsign\ztpki-rsa2048
+  RSA3072_CERT_PROJECT: vsign\ztpki-rsa3072
+  RSA4096_CERT_PROJECT: vsign\ztpki-rsa4096
+  ECDSA256_CERT_PROJECT: vsign\ztpki-p256
+  ECDSA384_CERT_PROJECT: vsign\ztpki-p384
+  ECDSA521_CERT_PROJECT: vsign\ztpki-p521
 
 jobs:
   docker-registry-v2-tests:
@@ -24,7 +30,7 @@ jobs:
       - uses: actions/checkout@v3.1.0
       - uses: actions/setup-go@v3.3.0
         with:
-          go-version: '1.22'
+          go-version: '1.24'
           check-latest: true
       - name: docker registry v2
         run: |
@@ -33,14 +39,6 @@ jobs:
           docker build -t ${{ env.REGISTRY}}/sample-venafi-csp-image:signed https://github.com/zosocanuck/sample-venafi-csp-pipeline.git#main
           docker image push ${{ env.REGISTRY }}/net-monitor:v1
           docker image push ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
-      - name: Create config.ini
-        uses: DamianReeves/write-file-action@v1.2
-        with:
-          path: ${{ github.workspace }}/config.ini
-          contents: |
-            tpp_url=${{ secrets.TPP_URL }}
-            access_token=${{ secrets.ACCESS_TOKEN }}
-            tpp_project=${{ secrets.TPP_PROJECT }}
       - name: build notation-venafi-csp plugin
         run: |
           make build
@@ -48,14 +46,106 @@ jobs:
           cp bin/notation-venafi-csp ~/.config/notation/plugins/venafi-csp/
       - name: setup Notation CLI
         uses: notaryproject/notation-action/setup@v1
+      - name: RSA-2048 test config.ini
+        uses: DamianReeves/write-file-action@v1.2
+        with:
+          path: ${{ github.workspace }}/config.ini
+          contents: |
+            tpp_url=${{ secrets.TPP_URL }}
+            access_token=${{ secrets.ACCESS_TOKEN }}
+            tpp_project=${{ env.RSA2048_CERT_PROJECT }}
       - name: Sign with notation
         run: |
-          notation key add ${{ secrets.CERTIFICATE_LABEL }} --plugin venafi-csp --id ${{ secrets.CERTIFICATE_LABEL }} --plugin-config "config"="${{ github.workspace }}/config.ini"
-          # notation certificate add --type ca --store ${{ secrets.DOMAIN }} ${{ github.workspace }}/vhroot.crt
+          notation key add vsign-ztpki-rsa2048 --plugin venafi-csp --id vsign-ztpki-rsa2048 --plugin-config "config"="${{ github.workspace }}/config.ini"
           echo "JWS envelope test"
-          notation sign -k ${{ secrets.CERTIFICATE_LABEL }} ${{ env.REGISTRY }}/net-monitor:v1
+          notation sign -k vsign-ztpki-rsa2048 ${{ env.REGISTRY }}/net-monitor:v1
           echo "COSE envelope test"
-          notation sign -k ${{ secrets.CERTIFICATE_LABEL }} --signature-format cose ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
+          notation sign -k vsign-ztpki-rsa2048 --signature-format cose ${{ env.REGISTRY }}/net-monitor:v1
           notation inspect ${{ env.REGISTRY }}/net-monitor:v1
-          notation inspect ${{ env.REGISTRY }}/sample-venafi-csp-image:signed
+      - name: RSA-3072 test config.ini
+        uses: DamianReeves/write-file-action@v1.2
+        with:
+          path: ${{ github.workspace }}/config.ini
+          write-mode: overwrite
+          contents: |
+            tpp_url=${{ secrets.TPP_URL }}
+            access_token=${{ secrets.ACCESS_TOKEN }}
+            tpp_project=${{ env.RSA3072_CERT_PROJECT }}
+      - name: Sign with notation
+        run: |
+          notation key add vsign-ztpki-rsa3072 --plugin venafi-csp --id vsign-ztpki-rsa3072 --plugin-config "config"="${{ github.workspace }}/config.ini"
+          echo "JWS envelope test"
+          notation sign -k vsign-ztpki-rsa3072 ${{ env.REGISTRY }}/net-monitor:v1
+          echo "COSE envelope test"
+          notation sign -k vsign-ztpki-rsa3072 --signature-format cose ${{ env.REGISTRY }}/net-monitor:v1
+          notation inspect ${{ env.REGISTRY }}/net-monitor:v1
+      - name: RSA-4096 test config.ini
+        uses: DamianReeves/write-file-action@v1.2
+        with:
+          path: ${{ github.workspace }}/config.ini
+          write-mode: overwrite
+          contents: |
+            tpp_url=${{ secrets.TPP_URL }}
+            access_token=${{ secrets.ACCESS_TOKEN }}
+            tpp_project=${{ env.RSA4096_CERT_PROJECT }}
+      - name: Sign with notation
+        run: |
+          notation key add vsign-ztpki-rsa4096 --plugin venafi-csp --id vsign-ztpki-rsa4096 --plugin-config "config"="${{ github.workspace }}/config.ini"
+          echo "JWS envelope test"
+          notation sign -k vsign-ztpki-rsa4096 ${{ env.REGISTRY }}/net-monitor:v1
+          echo "COSE envelope test"
+          notation sign -k vsign-ztpki-rsa4096 --signature-format cose ${{ env.REGISTRY }}/net-monitor:v1
+          notation inspect ${{ env.REGISTRY }}/net-monitor:v1
+      - name: ECDSA-P256 test config.ini
+        uses: DamianReeves/write-file-action@v1.2
+        with:
+          path: ${{ github.workspace }}/config.ini
+          write-mode: overwrite
+          contents: |
+            tpp_url=${{ secrets.TPP_URL }}
+            access_token=${{ secrets.ACCESS_TOKEN }}
+            tpp_project=${{ env.ECDSA256_CERT_PROJECT }}
+      - name: Sign with notation
+        run: |
+          notation key add vsign-ztpki-p256 --plugin venafi-csp --id vsign-ztpki-p256 --plugin-config "config"="${{ github.workspace }}/config.ini"
+          echo "JWS envelope test"
+          notation sign -k vsign-ztpki-p256 ${{ env.REGISTRY }}/net-monitor:v1
+          echo "COSE envelope test"
+          notation sign -k vsign-ztpki-p256 --signature-format cose ${{ env.REGISTRY }}/net-monitor:v1
+          notation inspect ${{ env.REGISTRY }}/net-monitor:v1
+      - name: ECDSA-P384 test config.ini
+        uses: DamianReeves/write-file-action@v1.2
+        with:
+          path: ${{ github.workspace }}/config.ini
+          write-mode: overwrite
+          contents: |
+            tpp_url=${{ secrets.TPP_URL }}
+            access_token=${{ secrets.ACCESS_TOKEN }}
+            tpp_project=${{ env.ECDSA384_CERT_PROJECT }}
+      - name: Sign with notation
+        run: |
+          notation key add vsign-ztpki-p384 --plugin venafi-csp --id vsign-ztpki-p384 --plugin-config "config"="${{ github.workspace }}/config.ini"
+          echo "JWS envelope test"
+          notation sign -k vsign-ztpki-p384 ${{ env.REGISTRY }}/net-monitor:v1
+          echo "COSE envelope test"
+          notation sign -k vsign-ztpki-p384 --signature-format cose ${{ env.REGISTRY }}/net-monitor:v1
+          notation inspect ${{ env.REGISTRY }}/net-monitor:v1
+      - name: ECDSA-P521 test config.ini
+        uses: DamianReeves/write-file-action@v1.2
+        with:
+          path: ${{ github.workspace }}/config.ini
+          write-mode: overwrite
+          contents: |
+            tpp_url=${{ secrets.TPP_URL }}
+            access_token=${{ secrets.ACCESS_TOKEN }}
+            tpp_project=${{ env.ECDSA521_CERT_PROJECT }}
+      - name: Sign with notation
+        run: |
+          notation key add vsign-ztpki-p521 --plugin venafi-csp --id vsign-ztpki-p521 --plugin-config "config"="${{ github.workspace }}/config.ini"
+          echo "JWS envelope test"
+          notation sign -k vsign-ztpki-p521 ${{ env.REGISTRY }}/net-monitor:v1
+          echo "COSE envelope test"
+          notation sign -k vsign-ztpki-p521 --signature-format cose ${{ env.REGISTRY }}/net-monitor:v1
+          notation inspect ${{ env.REGISTRY }}/net-monitor:v1
+        
   

@@ -80,17 +80,17 @@ func Key(ctx context.Context, req *plugin.DescribeKeyRequest) (*plugin.DescribeK
 func certToKeySpec(alg string) plugin.KeySpec {
 	switch alg {
 	case "RSA2048":
-		return proto.KeySpecRSA2048
+		return plugin.KeySpecRSA2048
 	case "RSA3072":
-		return proto.KeySpecRSA3072
+		return plugin.KeySpecRSA3072
 	case "RSA4096":
-		return proto.KeySpecRSA4096
+		return plugin.KeySpecRSA4096
 	case "ECCP256":
-		return proto.KeySpecEC256
+		return plugin.KeySpecEC256
 	case "ECCP384":
-		return proto.KeySpecEC384
+		return plugin.KeySpecEC384
 	case "ECCP521":
-		return proto.KeySpecEC521
+		return plugin.KeySpecEC521
 	}
 	return ""
 }

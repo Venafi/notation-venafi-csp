@@ -18,6 +18,7 @@ import (
 	"github.com/notaryproject/notation-core-go/signature"
 	"github.com/notaryproject/notation-go/plugin/proto"
 	"github.com/notaryproject/notation-plugin-framework-go/plugin"
+	"github.com/venafi/notation-venafi-csp/internal/types"
 	"github.com/venafi/notation-venafi-csp/internal/version"
 	c "github.com/venafi/vsign/pkg/crypto"
 	"github.com/venafi/vsign/pkg/endpoint"
@@ -131,8 +132,8 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 
 	sig, err := jwsOpts.Connector.Sign(&endpoint.SignOption{
 		KeyID:     jwsOpts.Env.KeyID,
-		Mechanism: jwsOpts.Mech,
-		DigestAlg: defaultDigestAlg,
+		Mechanism: jwsOpts.Mech.Mechanism,
+		DigestAlg: jwsOpts.Mech.Hash,
 		Payload:   []byte(sstr),
 		B64Flag:   false,
 		RawFlag:   false,
@@ -327,13 +328,21 @@ func mergeMaps(maps ...map[string]interface{}) (map[string]interface{}, error) {
 	return result, nil
 }
 
-func certAlgToJWTAlg(mech int) string {
-	switch mech {
-	case c.EcDsa:
+func certAlgToJWTAlg(signer types.SigningMethod) string {
+	switch signer.KeySize {
+	case 256:
 		return "ES256"
-	case c.RsaPkcsPss:
+	case 384:
+		return "ES384"
+	case 521:
+		return "ES512"
+	case 2048:
 		return "PS256"
+	case 3072:
+		return "PS384"
+	case 4096:
+		return "PS512"
 	default:
-		return ""
+		return "PS256"
 	}
 }
