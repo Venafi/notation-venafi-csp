@@ -109,7 +109,7 @@ func Verify(ctx context.Context, req *plugin.VerifySignatureRequest) (*plugin.Ve
 		processed[i] = s
 	}
 
-	var verifyResponse = &proto.VerifySignatureResponse{
+	var verifyResponse = &plugin.VerifySignatureResponse{
 		VerificationResults: results,
 		ProcessedAttributes: processed,
 	}

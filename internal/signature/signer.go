@@ -19,6 +19,7 @@ import (
 	"github.com/venafi/notation-venafi-csp/internal/logger"
 	"github.com/venafi/notation-venafi-csp/internal/signature/cose"
 	"github.com/venafi/notation-venafi-csp/internal/signature/jws"
+	"github.com/venafi/notation-venafi-csp/internal/types"
 	c "github.com/venafi/vsign/pkg/crypto"
 	"github.com/venafi/vsign/pkg/verror"
 	"github.com/venafi/vsign/pkg/vsign"
@@ -50,7 +51,6 @@ func SignEnvelope(ctx context.Context, req *plugin.GenerateEnvelopeRequest) (*pl
 			Err:  errors.New("invalid request input"),
 		}
 	}
-
 	err := setTLSConfig()
 	if err != nil {
 		return nil, proto.RequestError{
@@ -95,13 +95,13 @@ func SignEnvelope(ctx context.Context, req *plugin.GenerateEnvelopeRequest) (*pl
 			}
 		}
 
-		mech := certAlgToMech(certs[0])
-		if mech == 0 {
+		mech := certAlgToSigningMethod(certs[0])
+		/*if mech == 0 {
 			return nil, proto.RequestError{
 				Code: plugin.ErrorCodeValidation,
 				Err:  errors.New("unrecognized signing algorithm"),
 			}
-		}
+		}*/
 
 		var encoded []byte
 		var envelopeType string
@@ -150,13 +150,32 @@ func SignEnvelope(ctx context.Context, req *plugin.GenerateEnvelopeRequest) (*pl
 
 }
 
-func certAlgToMech(cert *x509.Certificate) int {
+func certAlgToSigningMethod(cert *x509.Certificate) types.SigningMethod {
 	switch cert.PublicKey.(type) {
 	case *ecdsa.PublicKey:
-		return c.EcDsa
+		return types.SigningMethod{Mechanism: c.EcDsa, KeySize: cert.PublicKey.(*ecdsa.PublicKey).Params().BitSize, Hash: bitSizeToHashAlg(cert.PublicKey.(*ecdsa.PublicKey).Params().BitSize)}
 	case *rsa.PublicKey:
-		return c.RsaPkcsPss
+		return types.SigningMethod{Mechanism: c.RsaPkcsPss, KeySize: cert.PublicKey.(*rsa.PublicKey).N.BitLen(), Hash: bitSizeToHashAlg(cert.PublicKey.(*rsa.PublicKey).N.BitLen())}
 	default:
-		return 0
+		return types.SigningMethod{}
+	}
+}
+
+func bitSizeToHashAlg(bitsize int) string {
+	switch bitsize {
+	case 256:
+		return "sha256"
+	case 384:
+		return "sha384"
+	case 521:
+		return "sha512"
+	case 2048:
+		return "sha256"
+	case 3072:
+		return "sha384"
+	case 4096:
+		return "sha512"
+	default:
+		return "sha256"
 	}
 }

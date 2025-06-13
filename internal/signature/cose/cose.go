@@ -8,6 +8,7 @@ import (
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/venafi/notation-venafi-csp/internal/signature/jws"
+	"github.com/venafi/notation-venafi-csp/internal/types"
 	"github.com/venafi/notation-venafi-csp/internal/version"
 	c "github.com/venafi/vsign/pkg/crypto"
 	"github.com/venafi/vsign/pkg/endpoint"
@@ -50,7 +51,7 @@ type venafiSigner struct {
 	tppOpts endpoint.Connector
 	env     endpoint.Environment
 	alg     cose.Algorithm
-	mech    int
+	mech    types.SigningMethod
 }
 
 func (signer *venafiSigner) Algorithm() cose.Algorithm {
@@ -60,8 +61,8 @@ func (signer *venafiSigner) Algorithm() cose.Algorithm {
 func (signer *venafiSigner) Sign(rand io.Reader, payload []byte) ([]byte, error) {
 	sig, err := signer.tppOpts.Sign(&endpoint.SignOption{
 		KeyID:     signer.env.KeyID,
-		Mechanism: signer.mech,
-		DigestAlg: defaultDigestAlg,
+		Mechanism: signer.mech.Mechanism,
+		DigestAlg: signer.mech.Hash,
 		Payload:   payload,
 		B64Flag:   false,
 		RawFlag:   false,
@@ -73,12 +74,20 @@ func (signer *venafiSigner) Sign(rand io.Reader, payload []byte) ([]byte, error)
 	return sig, nil
 }
 
-func mechToCOSEAlgorithm(mech int) cose.Algorithm {
-	switch mech {
-	case c.RsaPkcsPss:
+func mechToCOSEAlgorithm(mech types.SigningMethod) cose.Algorithm {
+	switch mech.KeySize {
+	case 2048:
 		return cose.AlgorithmPS256
-	case c.EcDsa:
+	case 3072:
+		return cose.AlgorithmPS384
+	case 4096:
+		return cose.AlgorithmPS512
+	case 256:
 		return cose.AlgorithmES256
+	case 384:
+		return cose.AlgorithmES384
+	case 521:
+		return cose.AlgorithmES512
 	default:
 		return cose.AlgorithmPS256
 	}
