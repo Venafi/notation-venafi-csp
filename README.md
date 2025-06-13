@@ -17,8 +17,8 @@ This is a plugin that aims to be compliant with the plugin [spec](https://github
 | Capability | Compatibility |
 | ---------- | ------------- |
 | keySpec | `RSA-2048`, `RSA-3072`, `RSA-4096`, `EC-256`, `EC-384`, `EC-521` |
-| hashAlgorithm | `SHA-256` |
-| signingAlgorithm | `RSASSA-PSS-SHA-256`, `ECDSA-SHA-256` |
+| hashAlgorithm | `SHA-256`, `SHA-384`, `SHA-512` |
+| signingAlgorithm | `RSASSA-PSS-SHA-256`, `RSSASSA-PSS-SHA-384`, `RSASSA-PSS-SHA-512`, `ECDSA-SHA-256`, `ECDSA-SHA-384`, `ECDSA-SHA-512` |
 | pluginCapability | `SIGNATURE_GENERATOR.ENVELOPE`, `SIGNATURE_VERIFIER.TRUSTED_IDENTITY` |
 | signatureEnvelopeType | `application/jose+json` ([JWS](https://datatracker.ietf.org/doc/html/rfc7515)), `application/cose` ([COSE](https://datatracker.ietf.org/doc/rfc9052)) |
 | extendedAttributes | `com.venafi.notation.plugin.x5u` (only generated with TPP 23.1+ for experimental identity validation support)|
@@ -29,7 +29,7 @@ This is a plugin that aims to be compliant with the plugin [spec](https://github
 The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
 - This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
-- Install notation [CLI](https://github.com/notaryproject/notation/releases/latest) per [documentation](https://notaryproject.dev/docs/user-guides/installation/cli/).  Version [v1.3.0](https://github.com/notaryproject/notation/releases/tag/v1.3.0) has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
+- Install notation [CLI](https://github.com/notaryproject/notation/releases/latest) per [documentation](https://notaryproject.dev/docs/user-guides/installation/cli/).  Version [v1.3.2](https://github.com/notaryproject/notation/releases/tag/v1.3.2) has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
 
 ## Installation
 
