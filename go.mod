@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
+	github.com/Azure/go-ntlmssp v0.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
