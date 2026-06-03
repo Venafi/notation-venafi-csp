@@ -21,7 +21,6 @@ import (
 	"github.com/venafi/notation-venafi-csp/internal/signature/jws"
 	"github.com/venafi/notation-venafi-csp/internal/types"
 	c "github.com/venafi/vsign/pkg/crypto"
-	"github.com/venafi/vsign/pkg/verror"
 	"github.com/venafi/vsign/pkg/vsign"
 )
 
@@ -106,17 +105,8 @@ func SignEnvelope(ctx context.Context, req *plugin.GenerateEnvelopeRequest) (*pl
 		var encoded []byte
 		var envelopeType string
 
-		// Obtain X5U lookup URL for identity validation during signature verification
-		x5u, err := connector.GetJwksX5u(certs[0])
-		if err != nil && err != verror.UnSupportedAPI {
-			return nil, proto.RequestError{
-				Code: plugin.ErrorCodeValidation,
-				Err:  errors.New("error obtaining jwks x5u"),
-			}
-		}
-
 		if req.SignatureEnvelopeType == signatureEnvelopeTypeCOSE {
-			encoded, err = cose.SignCOSEEnvelope(cose.COSEOptions{Connector: connector, Env: env, Mech: mech, X5u: x5u, Req: req})
+			encoded, err = cose.SignCOSEEnvelope(cose.COSEOptions{Connector: connector, Env: env, Mech: mech, Req: req})
 			if err != nil {
 				return nil, proto.RequestError{
 					Code: plugin.ErrorCodeValidation,
@@ -125,7 +115,7 @@ func SignEnvelope(ctx context.Context, req *plugin.GenerateEnvelopeRequest) (*pl
 			}
 			envelopeType = signatureEnvelopeTypeCOSE
 		} else { // JWS (jose+json)
-			encoded, err = jws.SignJWSEnvelope(jws.JWSOptions{Connector: connector, Env: env, Mech: mech, X5u: x5u, Req: req})
+			encoded, err = jws.SignJWSEnvelope(jws.JWSOptions{Connector: connector, Env: env, Mech: mech, Req: req})
 			if err != nil {
 				return nil, proto.RequestError{
 					Code: plugin.ErrorCodeValidation,

@@ -1,7 +1,9 @@
 package signature
 
 import (
+	"bytes"
 	"context"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"net"
@@ -106,7 +108,7 @@ func Verify(ctx context.Context, req *plugin.VerifySignatureRequest) (*plugin.Ve
 	results := make(map[plugin.Capability]*plugin.VerificationResult)
 	var attr []string
 
-	if url, found := req.Signature.CriticalAttributes.ExtendedAttributes[jws.HeaderVerificationPluginX5U]; found {
+	if x5uAttr, found := req.Signature.CriticalAttributes.ExtendedAttributes[jws.HeaderVerificationPluginX5U]; found {
 		// TPP 23.1+ capability
 		x5uURL := url.(string)
 
@@ -133,10 +135,71 @@ func Verify(ctx context.Context, req *plugin.VerifySignatureRequest) (*plugin.Ve
 		if err != nil {
 			results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
 				Success: false,
-				//Reason:  "identity validation failed due to missing certificate in CodeSign Protect",
-				Reason: err.Error(),
+				Reason:  "x5u attribute is not a string",
 			}
 		} else {
+			// Validate x5u URL scheme and host
+			parsed, err := url.Parse(x5uURL)
+			if err != nil {
+				results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+					Success: false,
+					Reason:  "x5u URL parsing failed: " + err.Error(),
+				}
+			} else if parsed.Scheme != "https" {
+				results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+					Success: false,
+					Reason:  "x5u URL must use HTTPS scheme",
+				}
+			} else {
+				// Validate x5u host matches configured TPP host
+				var tppHost string
+				if configPath, ok := req.PluginConfig["config"]; ok {
+					cfg, err := vsign.BuildConfig(ctx, configPath)
+					if err == nil {
+						baseURL, err := url.Parse(cfg.BaseUrl)
+						if err == nil {
+							tppHost = baseURL.Host
+						}
+					}
+				}
+				if tppHost == "" {
+					results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+						Success: false,
+						Reason:  "x5u validation requires pluginConfig[config] to verify TPP host",
+					}
+				} else if parsed.Host != tppHost {
+					results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+						Success: false,
+						Reason:  "x5u URL host does not match configured TPP host",
+					}
+				} else {
+					// Fetch certificate from validated x5u URL
+					leaf, err := tpp.GetPKSCertificate(x5uURL)
+					// If x5u exists however TPP no longer manages the lifecycle then fail identity validation
+					if err != nil {
+						results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+							Success: false,
+							//Reason:  "identity validation failed due to missing certificate in CodeSign Protect",
+							Reason: err.Error(),
+						}
+					} else {
+						// Bind x5u certificate to envelope signing certificate by comparing public keys
+						if len(req.Signature.CertificateChain) == 0 {
+							results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+								Success: false,
+								Reason:  "signature certificateChain is empty",
+							}
+						} else if signerCert, perr := x509.ParseCertificate(req.Signature.CertificateChain[0]); perr != nil {
+							results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+								Success: false,
+								Reason:  "error parsing signature certificateChain leaf",
+							}
+						} else if !bytes.Equal(leaf.RawSubjectPublicKeyInfo, signerCert.RawSubjectPublicKeyInfo) {
+							results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+								Success: false,
+								Reason:  "x5u certificate public key does not match signature certificateChain leaf",
+							}
+						} else {
 			var trustedX509Identities []map[string]string
 			for _, identity := range req.TrustPolicy.TrustedIdentities {
 				identityPrefix, identityValue, _ := strings.Cut(identity, ":")
@@ -185,6 +248,10 @@ func Verify(ctx context.Context, req *plugin.VerifySignatureRequest) (*plugin.Ve
 				}
 			}
 
+						}
+					}
+				}
+			}
 		}
 		attr = append(attr, jws.HeaderVerificationPluginX5U)
 	} else {

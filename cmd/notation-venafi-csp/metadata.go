@@ -34,7 +34,7 @@ func init() {
 		Version:                   version.GetVersion(),
 		URL:                       "https://github.com/Venafi/notation-venafi-csp",
 		SupportedContractVersions: []string{plugin.ContractVersion},
-		Capabilities:              []plugin.Capability{plugin.CapabilityEnvelopeGenerator, plugin.CapabilityTrustedIdentityVerifier},
+		Capabilities:              []plugin.Capability{plugin.CapabilityEnvelopeGenerator},
 	})
 	if err != nil {
 		panic(err)

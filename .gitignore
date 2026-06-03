@@ -29,3 +29,5 @@ test/config.ini
 # demo scripts/files
 test/kubecon-eu-2024-demo.sh
 test/trustpolicy-kubecon.json
+
+.DS_Store
