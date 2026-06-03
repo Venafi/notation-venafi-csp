@@ -34,10 +34,8 @@ func Key(ctx context.Context, req *plugin.DescribeKeyRequest) (*plugin.DescribeK
 				Err:  errors.New("error building config"),
 			}
 		}
-		//logger.Log("/Users/ivan.wallis/notation.log", "prior to vsign.NewClient\n")
 
 		connector, err := vsign.NewClient(&cfg)
-		//logger.Log("/Users/ivan.wallis/notation.log", err.Error())
 		if err != nil {
 			return nil, proto.RequestError{
 				Code: plugin.ErrorCodeValidation,
@@ -48,7 +46,6 @@ func Key(ctx context.Context, req *plugin.DescribeKeyRequest) (*plugin.DescribeK
 
 			logger.Log("/Users/ivan.wallis/notation.log", "Successfully connected to tpp")
 		}*/
-		//logger.Log("/Users/ivan.wallis/notation.log", "finish newclient\n")
 
 		keyAlg, err := connector.GetEnvironmentKeyAlgorithm()
 		if err != nil {
