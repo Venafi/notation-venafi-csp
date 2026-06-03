@@ -110,7 +110,7 @@ func Verify(ctx context.Context, req *plugin.VerifySignatureRequest) (*plugin.Ve
 
 	if x5uAttr, found := req.Signature.CriticalAttributes.ExtendedAttributes[jws.HeaderVerificationPluginX5U]; found {
 		// TPP 23.1+ capability
-		x5uURL := url.(string)
+		x5uURL := x5uAttr.(string)
 
 		// Validate x5u URL before making request
 		if baseURL != "" {
@@ -130,7 +130,7 @@ func Verify(ctx context.Context, req *plugin.VerifySignatureRequest) (*plugin.Ve
 			}
 		}
 
-		leaf, err := tpp.GetPKSCertificate(x5uURL)
+		_, err := tpp.GetPKSCertificate(x5uURL)
 		// If x5u exists however TPP no longer manages the lifecycle then fail identity validation
 		if err != nil {
 			results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
@@ -200,53 +200,53 @@ func Verify(ctx context.Context, req *plugin.VerifySignatureRequest) (*plugin.Ve
 								Reason:  "x5u certificate public key does not match signature certificateChain leaf",
 							}
 						} else {
-			var trustedX509Identities []map[string]string
-			for _, identity := range req.TrustPolicy.TrustedIdentities {
-				identityPrefix, identityValue, _ := strings.Cut(identity, ":")
-				if identityPrefix == trustedIdentitiesType {
-					parsedSubject, err := pkix.ParseDistinguishedName(identityValue)
-					if err != nil {
-						return nil, proto.RequestError{
-							Code: plugin.ErrorCodeValidation,
-							Err:  errors.New("error parsing X.509 certificate subject"),
-						}
-					}
-					trustedX509Identities = append(trustedX509Identities, parsedSubject)
-				}
+							var trustedX509Identities []map[string]string
+							for _, identity := range req.TrustPolicy.TrustedIdentities {
+								identityPrefix, identityValue, _ := strings.Cut(identity, ":")
+								if identityPrefix == trustedIdentitiesType {
+									parsedSubject, err := pkix.ParseDistinguishedName(identityValue)
+									if err != nil {
+										return nil, proto.RequestError{
+											Code: plugin.ErrorCodeValidation,
+											Err:  errors.New("error parsing X.509 certificate subject"),
+										}
+									}
+									trustedX509Identities = append(trustedX509Identities, parsedSubject)
+								}
 
-			}
+							}
 
-			leafCertDN, err := pkix.ParseDistinguishedName(leaf.Subject.String())
-			if err != nil {
-				return nil, proto.RequestError{
-					Code: plugin.ErrorCodeValidation,
-					Err:  errors.New("error while parsing the certificate subject from the digital signature"),
-				}
-			}
-			for _, trustedX509Identity := range trustedX509Identities {
-				if pkix.IsSubsetDN(trustedX509Identity, leafCertDN) {
-					results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
-						Success: true,
-						Reason:  "Identity validated with x5u extended attribute",
-					}
-					break
-				}
-			}
+							leafCertDN, err := pkix.ParseDistinguishedName(leaf.Subject.String())
+							if err != nil {
+								return nil, proto.RequestError{
+									Code: plugin.ErrorCodeValidation,
+									Err:  errors.New("error while parsing the certificate subject from the digital signature"),
+								}
+							}
+							for _, trustedX509Identity := range trustedX509Identities {
+								if pkix.IsSubsetDN(trustedX509Identity, leafCertDN) {
+									results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+										Success: true,
+										Reason:  "Identity validated with x5u extended attribute",
+									}
+									break
+								}
+							}
 
-			// Assume trustedIdentities configured as wildcard
-			if len(trustedX509Identities) == 0 {
-				results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
-					Success: true,
-					Reason:  "Identity validated with x5u extended attribute.  TrustedIdentities configured with wildcard policy.",
-				}
-			}
+							// Assume trustedIdentities configured as wildcard
+							if len(trustedX509Identities) == 0 {
+								results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+									Success: true,
+									Reason:  "Identity validated with x5u extended attribute.  TrustedIdentities configured with wildcard policy.",
+								}
+							}
 
-			if _, ok := results[plugin.CapabilityTrustedIdentityVerifier]; !ok {
-				results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
-					Success: false,
-					Reason:  "Signing certificate from digital signature does not match x.509 trusted identities defined in the trust policy",
-				}
-			}
+							if _, ok := results[plugin.CapabilityTrustedIdentityVerifier]; !ok {
+								results[plugin.CapabilityTrustedIdentityVerifier] = &plugin.VerificationResult{
+									Success: false,
+									Reason:  "Signing certificate from digital signature does not match x.509 trusted identities defined in the trust policy",
+								}
+							}
 
 						}
 					}
