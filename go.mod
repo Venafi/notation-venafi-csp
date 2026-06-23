@@ -1,17 +1,17 @@
 module github.com/venafi/notation-venafi-csp
 
-go 1.25.7
+go 1.26.0
 
 require (
 	github.com/notaryproject/notation-go v1.3.2
-	github.com/venafi/vsign v1.0.3-rc1.0.20260421132936-1387309f5fe0
+	github.com/venafi/vsign v1.0.3-rc1.0.20260622235614-aec33cfe1b43
 )
 
 require (
 	github.com/Azure/go-ntlmssp v0.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/digitorus/pkcs7 v0.0.0-20230818184609-3a137a874352 // indirect
-	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/google/certificate-transparency-go v1.3.3 // indirect
@@ -34,7 +34,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
-	gopkg.in/ini.v1 v1.67.1 // indirect
+	gopkg.in/ini.v1 v1.67.3 // indirect
 )
 
 require (

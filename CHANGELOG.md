@@ -1,3 +1,11 @@
+# v0.3.3
+
+## Enhancements
+
+* Code Sign Manager, SaaS support
+* Support for verificationPlugin attribute opt-out
+
+
 # v0.3.2
 
 ## Enhancements

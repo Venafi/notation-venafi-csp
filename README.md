@@ -1,9 +1,9 @@
-[![Venafi](https://raw.githubusercontent.com/Venafi/.github/master/images/Venafi_logo.png)](https://www.venafi.com/)
+
 [![Apache 2.0 License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![Community Supported](https://img.shields.io/badge/Support%20Level-Community-brightgreen)
-![Compatible with TPP 23.x](https://img.shields.io/badge/Compatibility-TPP%2023.x-f9a90c)
+![Compatible with Code Sign Manager, Self Hosted 23.1+ & Code Sign Manager, SaaS](https://img.shields.io/badge/Compatibility-Code%20Sign%20Manager%2C%20Self--Hosted%2023.1%2B%20%26%20Code%20Sign%20Manager%2C%20SaaS-f9a90c)
 
-Venafi CodeSign Protect Signature and Verification Plugin for the [Notation CLI](https://github.com/notaryproject/notation).
+CyberArk Code Sign Manager Signature and Verification Plugin for the [Notation CLI](https://github.com/notaryproject/notation).
 
 This is a plugin that aims to be compliant with the plugin [spec](https://github.com/notaryproject/notaryproject/blob/main/specs/plugin-extensibility.md).
 
@@ -21,14 +21,14 @@ This is a plugin that aims to be compliant with the plugin [spec](https://github
 | signingAlgorithm | `RSASSA-PSS-SHA-256`, `RSSASSA-PSS-SHA-384`, `RSASSA-PSS-SHA-512`, `ECDSA-SHA-256`, `ECDSA-SHA-384`, `ECDSA-SHA-512` |
 | pluginCapability | `SIGNATURE_GENERATOR.ENVELOPE`, `SIGNATURE_VERIFIER.TRUSTED_IDENTITY` |
 | signatureEnvelopeType | `application/jose+json` ([JWS](https://datatracker.ietf.org/doc/html/rfc7515)), `application/cose` ([COSE](https://datatracker.ietf.org/doc/rfc9052)) |
-| extendedAttributes | `com.venafi.notation.plugin.x5u` (only generated with TPP 23.1+ for experimental identity validation support)|
+| extendedAttributes | `com.venafi.notation.plugin.x5u` (only generated with TPF 23.1+ for experimental identity validation support)|
 | signingScheme | `notary.x509` |
 
 
 ## Getting Started:
-The following summarizes the steps to configure the Venafi CodeSign Protect notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
+The following summarizes the steps to configure the CyberArk Code Sign Manager notation plugin and sign and verify a container image.  The following steps are based off of the Notation hello-signing [example](https://github.com/notaryproject/notation/blob/main/docs/hello-signing.md#getting-started).
 
-- This plugin leverages the [Venafi vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
+- This plugin leverages the [CyberArk vSign SDK](https://github.com/venafi/vsign), which means you'll need to meet the pre-requisites as well as customize the config.ini in terms of `tpp_url`, `access_token`, and `tpp_project`.
 - Install notation [CLI](https://github.com/notaryproject/notation/releases/latest) per [documentation](https://notaryproject.dev/docs/user-guides/installation/cli/).  Version [v1.3.2](https://github.com/notaryproject/notation/releases/tag/v1.3.2) has been tested. Note that `make install` creates the plugin directory structure based on a MacOS environment.  Update the Makefile based on your OS.  It then copies the plugin to the appropriate location based on the notation plugin directory structure spec.
 
 ## Installation
@@ -104,10 +104,10 @@ As an example, you can use `notation policy import` to import the trust policy c
 notation policy import ./trustpolicy.json
 ```
 
-# Remotely sign with Venafi CodeSign Protect
+# Remotely sign with CyberArk Code Sign Manager
 - Obtain certificate
 
-You should use the certificate label that matches the Venafi CodeSign Protect environment obtained using `pkcs11config`:
+You should use the certificate label that matches the CyberArk Code Sign Manager environment obtained using `pkcs11config`:
 
 ```bash
 pkcs11config getcertificate <...>
@@ -154,4 +154,4 @@ notation verify $IMAGE
 Signature verification succeeded for sha256:73b3c3f2200bc6c161663b88b1fde3b3ed486518d6b6453fccdfdbbaefa09c7b
 ```
 
-*Note: Verification does perform an additional check of validating that the certificate does exist in CodeSign Protect via PKS for identity validation purposes when using TPP 23.1+.*
+*Note: Verification does perform an additional check of validating that the certificate does exist in Code Sign Manager via PKS for identity validation purposes when using TPF 23.1+.*
