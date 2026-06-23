@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -185,8 +186,16 @@ func SignJWSEnvelope(jwsOpts JWSOptions) ([]byte, error) {
 }
 
 func GenerateExtendedAttributes(x5u string) []signature.Attribute {
-	// Need extended protected headers for plugin signature envelope verification
 	var ext []signature.Attribute
+
+	// when set, omit the verificationPlugin requirement so signatures verify
+	// with a standard X.509 trust store * trust policy and no plugin/CodeSign at verify
+	// time - required for offline/air-gapped verification.
+	if os.Getenv("VENAFI_CSP_NO_VERIFICATION_PLUGIN") != "" {
+		return ext
+	}
+
+	// Need extended protected headers for plugin signature envelope verification
 	ext = append(ext, signature.Attribute{Key: headerVerificationPlugin, Value: version.PluginName, Critical: true})
 	ext = append(ext, signature.Attribute{Key: headerVerificationPluginMinVersion, Value: version.GetVerificationPluginMinVersion(), Critical: true})
 	// Test custom extended attribute
