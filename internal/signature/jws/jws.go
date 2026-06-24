@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/digitorus/timestamp"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/notaryproject/notation-core-go/signature"
 	"github.com/notaryproject/notation-go/plugin/proto"
 	"github.com/notaryproject/notation-plugin-framework-go/plugin"
