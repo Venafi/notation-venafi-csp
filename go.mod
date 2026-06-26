@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/notaryproject/notation-go v1.3.2
-	github.com/venafi/vsign v1.0.3-rc1.0.20260622235614-aec33cfe1b43
+	github.com/venafi/vsign v1.0.3
 )
 
 require (
