@@ -48,5 +48,5 @@ require (
 	github.com/notaryproject/notation-plugin-framework-go v1.0.0
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/veraison/go-cose v1.3.0
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 )
