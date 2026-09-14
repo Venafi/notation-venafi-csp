@@ -33,8 +33,8 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.41.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/text v0.42.0 // indirect
 	gopkg.in/ini.v1 v1.67.3 // indirect
 )
 
@@ -48,5 +48,5 @@ require (
 	github.com/notaryproject/notation-plugin-framework-go v1.0.0
 	github.com/urfave/cli/v2 v2.27.7
 	github.com/veraison/go-cose v1.3.0
-	golang.org/x/crypto v0.56.0
+	golang.org/x/crypto v0.57.0
 )
