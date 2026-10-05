@@ -1,11 +1,6 @@
 module github.com/venafi/notation-venafi-csp
 
-go 1.26.0
-
-require (
-	github.com/notaryproject/notation-go v1.3.2
-	github.com/venafi/vsign v1.0.3
-)
+go 1.27
 
 require (
 	github.com/Azure/go-ntlmssp v0.1.1 // indirect
@@ -39,14 +34,16 @@ require (
 )
 
 require (
-	github.com/cloudflare/cfssl v1.6.5
+	github.com/cloudflare/cfssl v1.7.0
 	github.com/digitorus/timestamp v0.0.0-20231217203849-220c5c2851b7
 	github.com/fxamacker/cbor/v2 v2.9.3
 	github.com/go-ldap/ldap/v3 v3.4.14
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/notaryproject/notation-core-go v1.3.0
+	github.com/notaryproject/notation-go v1.3.2
 	github.com/notaryproject/notation-plugin-framework-go v1.0.0
 	github.com/urfave/cli/v2 v2.27.7
+	github.com/venafi/vsign v1.0.3
 	github.com/veraison/go-cose v1.3.0
 	golang.org/x/crypto v0.56.0
 )
