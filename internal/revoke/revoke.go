@@ -50,10 +50,10 @@ func VerifyCertificate(cert *x509.Certificate) (revoked, ok bool) {
 func VerifyCertificateError(cert *x509.Certificate) (revoked, ok bool, err error) {
 	if !time.Now().Before(cert.NotAfter) {
 		msg := fmt.Sprintf("Certificate expired %s\n", cert.NotAfter)
-		return true, true, fmt.Errorf(msg)
+		return true, true, errors.New(msg)
 	} else if !time.Now().After(cert.NotBefore) {
 		msg := fmt.Sprintf("Certificate isn't valid until %s\n", cert.NotBefore)
-		return true, true, fmt.Errorf(msg)
+		return true, true, errors.New(msg)
 	}
 	return revCheck(cert)
 }
