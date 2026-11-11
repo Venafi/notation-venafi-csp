@@ -1,3 +1,15 @@
+# v0.3.4
+
+## Bug Fixes
+
+* Built with Go 1.27.3, which rejects certificate chains from the compromised eMudhra intermediate CAs (v0.3.3 was built with Go 1.26.0)
+
+## Others
+
+* GitHub workflows take the Go version from go.mod
+* Fixed two `go vet` errors (non-constant format strings) in the revocation checks
+
+
 # v0.3.3
 
 ## Enhancements
