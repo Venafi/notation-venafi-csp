@@ -1,6 +1,6 @@
 module github.com/venafi/notation-venafi-csp
 
-go 1.27
+go 1.27.3
 
 require (
 	github.com/Azure/go-ntlmssp v0.1.1 // indirect
