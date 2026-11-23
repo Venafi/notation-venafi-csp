@@ -34,7 +34,7 @@ require (
 )
 
 require (
-	github.com/cloudflare/cfssl v1.7.1
+	github.com/cloudflare/cfssl v1.7.2
 	github.com/digitorus/timestamp v0.0.0-20250524132541-c45532741eea
 	github.com/fxamacker/cbor/v2 v2.10.0
 	github.com/go-ldap/ldap/v3 v3.4.15
